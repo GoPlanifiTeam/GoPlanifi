@@ -4,6 +4,10 @@
 
 Este proyecto es una **aplicación Kotlin** desarrollada en **Android Studio** como parte de un proyecto de clase. El objetivo de la aplicación es proporcionar a los usuarios una guía de viajes que muestre diferentes destinos, características de mapas y más. El desarrollo sigue una **metodología ágil**, trabajando en **sprints**.
 
+## Version: Java|Android 
+java 18.0.2.1 2022-08-18
+compileSdk = 35
+
 ## Miembros del Equipo
 
 - **Daniel Grao**
@@ -55,6 +59,11 @@ Este proyecto está bajo una **licencia propietaria**. Se puede solicitar acceso
 ## Project Overview
 
 This project is a **Kotlin application** developed in **Android Studio** as part of a class project. The goal of the app is to provide users with a travel guide featuring different travel locations, map features, and more. The development follows an **Agile methodology**, working in **sprints**.
+
+## Version: Java|Android
+java 18.0.2.1 2022-08-18
+compileSdk = 35
+
 
 ## Team Members
 
