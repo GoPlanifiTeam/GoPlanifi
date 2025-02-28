@@ -1,7 +1,7 @@
 package com.example.travelplanner.classes
 
 data class Authentication(
-    var userId:String,
+    var userId:User,
     var loginErrors: Int,
 )
 {

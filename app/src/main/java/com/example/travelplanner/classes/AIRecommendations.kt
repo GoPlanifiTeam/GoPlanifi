@@ -1,3 +1,6 @@
 package com.example.travelplanner.classes
 
-data class AIRecommendations()
+data class AIRecommendations(
+    val trip: Trip,
+    val recommendations: List<String>,
+)
