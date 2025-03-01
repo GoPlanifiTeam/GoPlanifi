@@ -27,3 +27,34 @@ Our team follows a **feature-branching workflow** to ensure smooth collaboration
 4. **Create a pull request (PR)** targeting `main`.
 5. **Request a review** from another team member.
 6. **Merge** the PR after approval.
+
+-------------------------------------------------------------------
+# Guía de Contribución
+
+## Estrategia de Ramificación
+
+Nuestro equipo sigue un **flujo de trabajo basado en ramas de características** para garantizar una colaboración fluida y mantener la estabilidad del código.
+
+### Estructura de Ramas
+
+- **`main`**: La rama principal donde se fusiona el código estable, revisado y probado.
+- **`origin/daniel/dev`** & **`origin/ferran/dev`**: Cada desarrollador trabaja en su propia rama de características para garantizar la separación de responsabilidades.
+- Se pueden crear ramas adicionales según nuevas tareas.
+
+### Flujo de Trabajo
+
+1. **Crear una nueva rama** antes de trabajar en una característica o corrección de errores:
+   ```sh
+   git checkout -b feature/nombre-de-rama
+   ```
+2. **Realizar cambios** y hacer commits regularmente con mensajes descriptivos:
+   ```sh
+   git commit -m "Agregar funcionalidad XYZ"
+   ```
+3. **Subir tu rama** al repositorio remoto:
+   ```sh
+   git push origin feature/nombre-de-rama
+   ```
+4. **Crear un pull request (PR)** apuntando a `main`.
+5. **Solicitar una revisión** a otro miembro del equipo.
+6. **Fusionar** el PR después de su aprobación.

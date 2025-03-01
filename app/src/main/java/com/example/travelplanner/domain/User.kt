@@ -1,4 +1,4 @@
-package com.example.travelplanner.classes
+package com.example.travelplanner.domain
 
 data class User(
     var userId: String,

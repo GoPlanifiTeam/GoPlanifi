@@ -1,4 +1,135 @@
-# Documento de Diseño
+## General Description
+
+This document describes the architecture and design of the system, including its main entities, attributes, methods, and relationships.
+
+## Entities and Responsibilities
+
+| Entity                     | Attributes                                                                                                                                         | Methods                                                      |
+|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| **Authentication**         | `User userId`, `Int loginErrors`                                                                                                                  | `login(User) : Boolean`<br>`logout(User) : Boolean`<br>`resetPassword(User) : Boolean` |
+| **User**                   | `String userId`, `String email`, `String password`, `String firstName`, `String lastName`, `List<Trip> trips`, `String imageURL`                   | -                                                            |
+| **Preferences**            | `User userId`, `Boolean notificationsEnabled`, `String preferredLanguage`, `String theme`                                                         | `updatePreferences(String, String, Boolean)`                 |
+| **Trip**                   | `Map map`, `String id`, `User user`, `String destination`, `List<ItineraryItem> itineraries`, `String startDate`, `String endDate`, `List<Image> images`, `List<AIRecommendations> aiRecommendations` | - |
+| **Map**                    | `Double latitude`, `Double longitude`, `String direction`                                                                                          | `showLocation() : String`<br>`getNearbyPlaces() : String`    |
+| **Itinerary Item**         | `Trip trip`, `String id`, `String name`, `String location`, `String startDate`, `String endDate`                                                   | -                                                            |
+| **Image**                  | `Trip trip`, `Int id`, `String imageURL`                                                                                                          | -                                                            |
+| **AI Recommendations**     | `Trip trip`, `List<String> recommendations`                                                                                                      | -                                                            |
+
+### 1. Authentication
+
+Handles user authentication, including login, logout, and password reset.
+
+#### Attributes:
+
+- `User userId`
+- `Int loginErrors`
+
+#### Methods:
+
+- `login(User) : Boolean`
+- `logout(User) : Boolean`
+- `resetPassword(User) : Boolean`
+
+### 2. User
+
+Represents a user in the system, storing personal information and associated trips.
+
+#### Attributes:
+
+- `String userId`
+- `String email`
+- `String password`
+- `String firstName`
+- `String lastName`
+- `List<Trip> trips`
+- `String imageURL`
+
+### 3. Preferences
+
+Stores user preferences such as language and theme.
+
+#### Attributes:
+
+- `User userId`
+- `Boolean notificationsEnabled`
+- `String preferredLanguage`
+- `String theme`
+
+#### Methods:
+
+- `updatePreferences(String, String, Boolean)`
+
+### 4. Trip
+
+Represents a trip, including destination, itinerary, images, and AI-generated recommendations.
+
+#### Attributes:
+
+- `Map map`
+- `String id`
+- `User user`
+- `String destination`
+- `List<ItineraryItem> itineraries`
+- `String startDate`
+- `String endDate`
+- `List<Image> images`
+- `List<AIRecommendations> aiRecommendations`
+
+### 5. Map
+
+Stores geographical details of a trip.
+
+#### Attributes:
+
+- `Double latitude`
+- `Double longitude`
+- `String direction`
+
+#### Methods:
+
+- `showLocation() : String`
+- `getNearbyPlaces() : String`
+
+### 6. Itinerary Item
+
+Represents an item within a trip itinerary.
+
+#### Attributes:
+
+- `Trip trip`
+- `String id`
+- `String name`
+- `String location`
+- `String startDate`
+- `String endDate`
+
+### 7. Image
+
+Represents an image associated with a trip.
+
+#### Attributes:
+
+- `Trip trip`
+- `Int id`
+- `String imageURL`
+
+### 8. AI Recommendations
+
+Stores AI-generated recommendations for a trip.
+
+#### Attributes:
+
+- `Trip trip`
+- `List<String> recommendations`
+
+## Relationships
+
+- `User` can have multiple `Trip` objects.
+- `Trip` contains `Map`, `ItineraryItem`, `Image`, and `AIRecommendations`.
+- `ItineraryItem` is linked to a `Trip`.
+- `Preferences` and `Authentication` are related to `User`.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Descripción General
 

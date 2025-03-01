@@ -26,8 +26,10 @@ hs_err_pid*
 replay_pid*
 .idea/gradle.xml
 /.idea
-/.idea
-/.idea
+*.properties
+*.lock
+*.bin
+*.probe
 /.gradle
-/.idea
-/.gradle
+.gradle
+.idea
