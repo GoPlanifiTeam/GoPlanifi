@@ -1,4 +1,4 @@
-# Travel Planner
+# GoPlanifi
 
 ## Descripción del Proyecto
 
@@ -56,7 +56,7 @@ Este proyecto está bajo una **licencia propietaria**. Se puede solicitar acceso
 
 ---
 
-## Project Overview
+## GoPlanifi
 
 This project is a **Kotlin application** developed in **Android Studio** as part of a class project. The goal of the app is to provide users with a travel guide featuring different travel locations, map features, and more. The development follows an **Agile methodology**, working in **sprints**.
 

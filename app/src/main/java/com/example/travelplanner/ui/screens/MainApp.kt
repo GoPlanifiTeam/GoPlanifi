@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.FormatListNumbered
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
@@ -19,75 +20,105 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 // Enum para representar el modo seleccionado
-enum class CalculatorMode {
-    BASIC, IMC, LIST
+enum class DisplayMode {
+    Trip, Itinerary, UserPreferences
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun mainAppPage(navController: NavController) {
     // Estado que guarda el modo actual
-    var selectedCalculator by remember { mutableStateOf(CalculatorMode.BASIC) }
+    var selectedDisplayMode by remember { mutableStateOf(DisplayMode.Trip) }
     var showSettingsMenu by remember { mutableStateOf(false) }
     // Esto es la estructura para todas las paginas, de Top Bar y Bottom Bar
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Home Screen") },
-                actions = {
-                    Box {
-                        IconButton(onClick = { showSettingsMenu = !showSettingsMenu }) {
-                            Icon(Icons.Outlined.Settings, contentDescription = "Settings")
-                        }
-                        DropdownMenu(
-                            expanded = showSettingsMenu,
-                            onDismissRequest = { showSettingsMenu = false }
+                title = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Sección Izquierda: Botón de menú
+                        IconButton(
+                            onClick = {  },
+                            modifier = Modifier.wrapContentSize()
                         ) {
-                            DropdownMenuItem(
-                                leadingIcon = { Icon(Icons.Filled.Info, contentDescription = "About Icon") },
-                                text = { Text("About") },
-                                onClick = {
-                                    showSettingsMenu = false
-                                    navController.navigate("about")
-                                }
-                            )
-                            DropdownMenuItem(
-                                leadingIcon = { Icon(Icons.Filled.Build, contentDescription = "Version Icon") },
-                                text = { Text("Version") },
-                                onClick = {
-                                    showSettingsMenu = false
-                                    navController.navigate("version")
-                                }
-                            )
-                            DropdownMenuItem(
-                                leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Profile Icon") },
-                                text = { Text("Profile") },
-                                onClick = {
-                                    showSettingsMenu = false
-                                    navController.navigate("profile")
-                                }
-                            )
-                            DropdownMenuItem(
-                                leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = "Settings Icon") },
-                                text = { Text("Settings") },
-                                onClick = {
-                                    showSettingsMenu = false
-                                    navController.navigate("settings")
-                                }
-                            )
+                            Icon(Icons.Filled.Home, contentDescription = "Menu")
+                        }
+
+                        // Sección Central: Título (ocupa menos espacio)
+                        Text(
+                            text = "Home",
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.weight(0.9f), // Ocupa menos espacio
+                        )
+
+                        // Sección Derecha: Configuración y menú desplegable (más espacio)
+                        Box(
+                            modifier = Modifier.weight(0.5f), // Ocupa más espacio
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            IconButton(onClick = { showSettingsMenu = !showSettingsMenu }) {
+                                Icon(Icons.Outlined.Settings, contentDescription = "Settings")
+                            }
+                            DropdownMenu(
+                                expanded = showSettingsMenu,
+                                onDismissRequest = { showSettingsMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    leadingIcon = { Icon(Icons.Filled.Info, contentDescription = "About Icon") },
+                                    text = { Text("About") },
+                                    onClick = {
+                                        showSettingsMenu = false
+                                        navController.navigate("about")
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    leadingIcon = { Icon(Icons.Filled.Build, contentDescription = "Version Icon") },
+                                    text = { Text("Version") },
+                                    onClick = {
+                                        showSettingsMenu = false
+                                        navController.navigate("version")
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    leadingIcon = { Icon(Icons.Filled.Person, contentDescription = "Profile Icon") },
+                                    text = { Text("Profile") },
+                                    onClick = {
+                                        showSettingsMenu = false
+                                        navController.navigate("profile")
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    leadingIcon = { Icon(Icons.Filled.Settings, contentDescription = "Settings Icon") },
+                                    text = { Text("Settings") },
+                                    onClick = {
+                                        showSettingsMenu = false
+                                        navController.navigate("settings")
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             )
-
+        },//FAB
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {  },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                //Icon(Icons.Filled.Add, contentDescription = "Add")
+                Text("hi")
+            }
         },
-
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Menu, contentDescription = "Básica") },
-                    selected = selectedCalculator == CalculatorMode.BASIC,
-                    onClick = { selectedCalculator = CalculatorMode.BASIC },
+                    selected = selectedDisplayMode == DisplayMode.Trip,
+                    onClick = { selectedDisplayMode = DisplayMode.Trip },
                     label = { Text("Básica") }
                 )
                 //iconos
@@ -95,15 +126,15 @@ fun mainAppPage(navController: NavController) {
                 //https://developer.android.com/reference/kotlin/androidx/compose/material/icons/package-summary
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Scale, contentDescription = "IMC") },
-                    selected = selectedCalculator == CalculatorMode.IMC,
-                    onClick = { selectedCalculator = CalculatorMode.IMC },
+                    selected = selectedDisplayMode == DisplayMode.Itinerary,
+                    onClick = { selectedDisplayMode = DisplayMode.Itinerary },
                     label = { Text("IMC") }
                 )
 
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.FormatListNumbered, contentDescription = "LIST") },
-                    selected = selectedCalculator == CalculatorMode.LIST,
-                    onClick = { selectedCalculator = CalculatorMode.LIST },
+                    selected = selectedDisplayMode == DisplayMode.UserPreferences,
+                    onClick = { selectedDisplayMode = DisplayMode.UserPreferences },
                     label = { Text("LIST") }
                 )
             }
@@ -115,17 +146,18 @@ fun mainAppPage(navController: NavController) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when (selectedCalculator) {
-                CalculatorMode.BASIC -> BasicCalculator()
-                CalculatorMode.IMC -> IMCCalculator()
-                CalculatorMode.LIST -> ListExample()
+            when (selectedDisplayMode) {
+                DisplayMode.Trip -> Trip()
+                DisplayMode.Itinerary -> Itinerary()
+                DisplayMode.UserPreferences -> UserPreferences()
             }
         }
     }
+
 }
 
 @Composable
-fun BasicCalculator() {
+fun Trip() {
     // Vista placeholder para la calculadora básica
     Column(
         modifier = Modifier
@@ -140,7 +172,7 @@ fun BasicCalculator() {
 }
 
 @Composable
-fun IMCCalculator() {
+fun Itinerary() {
     // Vista placeholder para la calculadora de IMC
     Column(
         modifier = Modifier
@@ -157,7 +189,7 @@ fun IMCCalculator() {
 
 
 @Composable
-fun ListExample() {
+fun UserPreferences() {
     // Vista placeholder para la calculadora de IMC
     Column(
         modifier = Modifier
