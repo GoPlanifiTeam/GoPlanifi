@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">GoPlanifi</string>
+    <string name="trip">Voyage</string>
+    <string name="itinerary">Itinéraire</string>
+    <string name="userPreference">Préférences utilisateur</string>
+    <string name="welcome">Bienvenue à</string>
+    <string name="fab">FAB</string>
+    <string name="aboutScreen">À propos</string>
+    <string name="listExample">Mes voyages</string>
+    <string name="profileScreen">Profil</string>
+    <string name="mainApp">Accueil</string>
+    <string name="settingsScreen">Paramètres</string>
+    <string name="versionScreen">Version</string>
+
+    <!-- Profile Screen -->
+    <string name="profile">Profil</string>
+    <string name="profile_screen">Écran de profil</string>
+    <string name="profile_name">Nom: John Doe</string>
+    <string name="profile_email">E-mail: john.doe@example.com</string>
+    <string name="profile_location">Localisation: Madrid, Espagne</string>
+    <string name="profile_info">Informations supplémentaires du profil, paramètres, photo, etc.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings">Paramètres</string>
+    <string name="settings_screen">Écran des paramètres</string>
+    <string name="settings_notifications">Paramètres des notifications</string>
+    <string name="settings_language">Paramètres de langue</string>
+    <string name="settings_theme">Thème sombre ou clair</string>
+    <string name="settings_advanced">Paramètres avancés…</string>
+
+    <!-- Version Screen -->
+    <string name="version">Version</string>
+    <string name="version_screen">Écran de version</string>
+    <string name="version_app_name">Application: MyApp</string>
+    <string name="version_current">Version actuelle: 1.0.0</string>
+    <string name="version_release_date">Date de sortie: Février 2025</string>
+    <string name="version_changelog">Journal des modifications :</string>
+    <string name="version_changelog_login">- Ajout de l\'écran de connexion</string>
+    <string name="version_changelog_performance">- Améliorations des performances</string>
+
+    <!-- About Screen -->
+    <string name="about">À propos</string>
+    <string name="about_screen">Écran d\'information</string>
+    <string name="about_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
+    <string name="about_details">Ici, vous pouvez décrire l\'application, l\'entreprise ou toute autre information pertinente.</string>
+    <string name="about_contact">Contact: contact@example.com</string>
+
+    <!-- List Example -->
+    <string name="add_item">Ajouter un élément</string>
+    <string name="add_shopping_item">Ajouter un article de shopping</string>
+    <string name="add">Ajouter</string>
+    <string name="cancel">Annuler</string>
+    <string name="quantity">Quantité :</string>
+    <string name="save">Enregistrer</string>
+
+    <!-- Main App Navigation -->
+    <string name="menu">Menu</string>
+
+    <string name="list">Liste</string>
+
+    <string name="terms_screen">Conditions Générales</string>
+    <string name="termsAppScreen">terms</string>
+    <string name="terms_title">Conditions Générales d\'Utilisation</string>
+    <string name="terms_intro">Veuillez lire attentivement ces conditions</string>
+    <string name="terms_usage">Politique d\'Utilisation</string>
+    <string name="terms_usage_text">En utilisant cette application, vous acceptez de respecter toutes les règles et réglementations.</string>
+    <string name="terms_privacy">Politique de Confidentialité</string>
+    <string name="terms_privacy_text">Nous nous engageons à protéger vos données et votre confidentialité.</string>
+    <string name="terms_contact">Informations de Contact</string>
+    <string name="terms_contact_text">Pour toute question, contactez-nous à support@example.com.</string>
+
+
+
+    <!-- Misc -->
+    <string name="back_icon">Icône de retour</string>
+
+</resources>
