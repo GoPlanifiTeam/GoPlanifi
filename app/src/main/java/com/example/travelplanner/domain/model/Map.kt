@@ -1,6 +1,7 @@
 package com.example.travelplanner.domain.model
 
 data class Map(
+    val id: String,
     var latitud: Double,
     var longitud: Double,
     var direction: String,

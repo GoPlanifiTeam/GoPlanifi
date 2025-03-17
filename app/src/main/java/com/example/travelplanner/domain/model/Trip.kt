@@ -1,13 +1,11 @@
+// Trip.kt
 package com.example.travelplanner.domain.model
 
 data class Trip(
-    val map: Map,
     val id: String,
-    val user: User,
+    val userId: String,
+    val mapId: String,
     val destination: String,
-    val itineraries: List<ItineraryItem>,
     val startDate: String,
-    val endDate: String,
-    val images: List<Image>,
-    val aiRecommendations: List<AIRecommendations>
+    val endDate: String
 )

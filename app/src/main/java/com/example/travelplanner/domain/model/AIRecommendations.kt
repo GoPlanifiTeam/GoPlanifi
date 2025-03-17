@@ -1,6 +1,7 @@
 package com.example.travelplanner.domain.model
 
 data class AIRecommendations(
-    val trip: Trip,
-    val recommendations: List<String>,
+    val id: String,
+    val tripId: String,
+    val recommendations: List<String>
 )
