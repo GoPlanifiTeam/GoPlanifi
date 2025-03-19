@@ -73,4 +73,7 @@
 
     <!-- Misc -->
     <string name="back_icon">Icono de retroceso</string>
+    <string name="add_trip">trip</string>
+    <string name="trip_name">trip_name</string>
+    <string name="trip_destination">trip_destination</string>
 </resources>

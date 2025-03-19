@@ -24,42 +24,25 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
         setContent {
-            var showSplash by remember { mutableStateOf(true) }
-
-            LaunchedEffect(Unit) {
-                delay(3500) // Show GIF for 3 seconds
-                showSplash = false // Start fading out
-            }
-
             TestingTheme {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    MainScreen() // Load MainScreen immediately so that I don't have that little delay
-                    AnimatedVisibility(
-                        visible = showSplash,
-                        exit = fadeOut(animationSpec = tween(200)) // 1s fade-out
-                    ) {
-                        SplashScreen(onSplashFinished = { showSplash = false })
-                    }
-                }
+                MainScreen() // Load MainScreen first for better performance
             }
         }
     }
 }
-
 
 @Composable
 fun SplashScreen(onSplashFinished: () -> Unit) {
     var isVisible by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        delay(3000) // Show GIF for 3 seconds
+        delay(3000) // Show splash screen for 3 seconds
         isVisible = false // Start fade-out transition (1s)
         delay(1000) // Wait for fade animation to complete
         onSplashFinished() // Notify that splash is finished
@@ -97,5 +80,20 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    NavGraph(navController = navController)
+    var showSplash by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        delay(3500)
+        showSplash = false
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        NavGraph(navController = navController)
+        AnimatedVisibility(
+            visible = showSplash,
+            exit = fadeOut(animationSpec = tween(200))
+        ) {
+            SplashScreen(onSplashFinished = { showSplash = false })
+        }
+    }
 }

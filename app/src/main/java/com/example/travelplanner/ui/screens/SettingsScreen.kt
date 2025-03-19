@@ -1,30 +1,47 @@
 package com.example.travelplanner.ui.screens
-
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import java.util.Locale
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.travelplanner.ui.viewmodel.SettingsViewModel
 import com.example.travelplanner.R
+import androidx.compose.runtime.getValue
+import com.example.travelplanner.domain.model.User
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import com.example.travelplanner.domain.repository.PreferencesRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
-    val context = LocalContext.current
-    var selectedLanguage by remember { mutableStateOf(getSavedLanguage(context)) }
-    var refresh by remember { mutableStateOf(false) } // 🔄 Triggers recomposition
+fun SettingsScreen(
+    navController: NavController,
+    settingsViewModel: SettingsViewModel = SettingsViewModel(PreferencesRepository())
+) {
+    val settingsState by settingsViewModel.settingsState.collectAsState()
+    val context = LocalContext.current // ✅ Get Context inside Compose
+    // ✅ Load user preferences
+    val user = User(
+        userId = "1",
+        email = "test@example.com",
+        password = "1234",
+        firstName = "John",
+        lastName = "Doe",
+        trips = emptyList(),
+        imageURL = "https://example.com/image.png"
+    )
+
+    LaunchedEffect(Unit) {
+        settingsViewModel.loadPreferences(user)
+    }
 
     Scaffold(
-        topBar = { CommonTopBar(title = stringResource(R.string.settingsScreen), navController) }, // ✅ Now using `CommonTopBar`
+        topBar = { CommonTopBar(title = stringResource(R.string.profileScreen), navController) },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -33,35 +50,41 @@ fun SettingsScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(stringResource(R.string.settings_screen), style = MaterialTheme.typography.headlineMedium) // "Settings Screen"
-            Text(stringResource(R.string.settings_notifications)) // "Notification settings"
+            Text(text = "Settings", style = MaterialTheme.typography.headlineSmall)
 
-            // Language Selection Dropdown
-            Text(stringResource(R.string.settings_language)) // "Language settings"
-            LanguageSelector(context, navController) { newLanguage ->
-                selectedLanguage = newLanguage
-                setLocale(context, newLanguage)
-                refresh = !refresh // 🔄 Force recomposition
-                navController.navigate("settings") // Reload settings to update language instantly
+            // ✅ Notifications Toggle
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(text = "Enable Notifications")
+                Switch(
+                    checked = settingsState.notificationsEnabled,
+                    onCheckedChange = { settingsViewModel.toggleNotifications(user, it) }
+                )
             }
 
-            Text(stringResource(R.string.settings_theme)) // "Dark or Light Theme"
-            HorizontalDivider(thickness = 1.dp)
-            Text(stringResource(R.string.settings_advanced)) // "More advanced settings..."
+            val context = LocalContext.current // ✅ Get context before calling a non-Composable function
+
+            LanguageSelector(context = context) { selectedLanguage ->
+                settingsViewModel.changeLanguage(user, selectedLanguage, context) // ✅ Now `context` is passed correctly
+            }
+
         }
     }
 }
 
 @Composable
-fun LanguageSelector(context: Context, navController: NavController, onLanguageChange: (String) -> Unit) {
+fun LanguageSelector(context: Context, onLanguageChange: (String) -> Unit) {
     val languages = listOf("English", "Español", "Français", "Português")
     val languageCodes = listOf("en", "es", "fr", "pt")
     var selectedLanguage by remember { mutableStateOf(getSavedLanguage(context)) }
     var expanded by remember { mutableStateOf(false) }
 
-    Box {
+    Column {
+        Text(text = "Select Language:")
         Button(onClick = { expanded = true }) {
-            Text(selectedLanguage.uppercase()) // Show selected language
+            Text(selectedLanguage.uppercase())
         }
         DropdownMenu(
             expanded = expanded,
@@ -95,7 +118,6 @@ fun setLocale(context: Context, languageCode: String) {
 
     context.resources.updateConfiguration(config, context.resources.displayMetrics)
 
-    // Save selection to SharedPreferences
     val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     sharedPreferences.edit().putString("language", languageCode).apply()
 }

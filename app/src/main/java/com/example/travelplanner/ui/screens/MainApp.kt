@@ -116,7 +116,6 @@ fun UserPreferences() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = stringResource(R.string.listExample), style = MaterialTheme.typography.headlineMedium ) // "User Preferences"
-
         ListApp()
     }
 }
