@@ -1,6 +1,8 @@
 package com.example.travelplanner.domain.model
 
+import com.example.travelplanner.domain.repository.TripRepository
+
 data class AIRecommendations(
-    val trip: Trip,
+    val trip: TripRepository,
     val recommendations: List<String>,
 )

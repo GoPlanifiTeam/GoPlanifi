@@ -14,16 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.travelplanner.R
-import com.example.travelplanner.ui.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    profileViewModel: ProfileViewModel = viewModel()
 ) {
-    val profileState by profileViewModel.profileState.collectAsState()
-
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.profileScreen), navController) },
     ) { paddingValues ->
@@ -34,9 +30,9 @@ fun ProfileScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(profileState.name, style = MaterialTheme.typography.headlineMedium)
-            Text(profileState.email)
-            Text(profileState.location)
+            stringResource(R.string.profileScreen)
+            stringResource(R.string.profileScreen)
+            stringResource(R.string.profileScreen)
         }
     }
 }

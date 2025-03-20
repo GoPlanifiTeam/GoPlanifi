@@ -8,6 +8,6 @@ data class Trip(
     val itineraries: List<ItineraryItem> = emptyList(),
     val startDate: String,
     val endDate: String,
-    val images: List<Image>,
-    val aiRecommendations: List<AIRecommendations>
+    val images: List<Image>?,
+    val aiRecommendations: List<AIRecommendations>?
 )

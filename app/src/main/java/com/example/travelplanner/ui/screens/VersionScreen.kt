@@ -6,23 +6,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.travelplanner.R
-import com.example.travelplanner.ui.viewmodel.VersionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VersionScreen(
     navController: NavController,
-    versionViewModel: VersionViewModel = viewModel()
 ) {
-    val versionInfo by versionViewModel.versionState.collectAsState()
+    // Hardcoded version information
+    val versionInfo = VersionInfo(
+        appName = "Travel Planner",
+        version = "1.0.0",
+        releaseDate = "2025-03-20",
+        changelog = listOf(
+            "Initial release",
+            "Added trip management",
+            "User authentication support"
+        )
+    )
 
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.versionScreen), navController) },
@@ -34,6 +39,7 @@ fun VersionScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Display version information
             Text(versionInfo.appName, style = MaterialTheme.typography.headlineMedium)
             Text("Version: ${versionInfo.version}")
             Text("Release Date: ${versionInfo.releaseDate}")
@@ -47,4 +53,10 @@ fun VersionScreen(
     }
 }
 
-
+// Data class to represent version information
+data class VersionInfo(
+    val appName: String,
+    val version: String,
+    val releaseDate: String,
+    val changelog: List<String>
+)
