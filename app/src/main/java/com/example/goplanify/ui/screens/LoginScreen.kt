@@ -48,19 +48,19 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Login Screen", style = MaterialTheme.typography.headlineMedium)
+        Text(text = stringResource(R.string.profileScreen), style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(20.dp))
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text(stringResource(R.string.default_user)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.default_pass)) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
         )
@@ -78,7 +78,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Login")
+            Text(text = stringResource(R.string.mainApp))
         }
     }
 
@@ -86,11 +86,11 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
     if (showAlert) {
         AlertDialog(
             onDismissRequest = { showAlert = false },
-            title = { Text("Login Failed") },
-            text = { Text("Invalid username or password.") },
+            title = { Text(stringResource(R.string.cancel)) },
+            text = { Text(stringResource(R.string.about_contact)) },
             confirmButton = {
                 Button(onClick = { showAlert = false }) {
-                    Text("OK")
+                    Text(stringResource(R.string.add))
                 }
             }
         )

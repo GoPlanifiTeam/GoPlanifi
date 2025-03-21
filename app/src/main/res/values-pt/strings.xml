@@ -15,9 +15,9 @@
     <!-- Profile Screen -->
     <string name="profile">Perfil</string>
     <string name="profile_screen">Tela de perfil</string>
-    <string name="profile_name">Nome: John Doe</string>
-    <string name="profile_email">E-mail: john.doe@example.com</string>
-    <string name="profile_location">Localização: Madrid, Espanha</string>
+    <string name="profile_name">Nome:</string>
+    <string name="profile_email">E-mail:</string>
+    <string name="profile_location">Localização:</string>
     <string name="profile_info">Informações adicionais do perfil, configurações, foto, etc.</string>
 
     <!-- Settings Screen -->
@@ -31,7 +31,7 @@
     <!-- Version Screen -->
     <string name="version">Versão</string>
     <string name="version_screen">Tela de versão</string>
-    <string name="version_app_name">Aplicação: MyApp</string>
+    <string name="version_app_name">Aplicação: GoPlanifi</string>
     <string name="version_current">Versão atual: 1.0.0</string>
     <string name="version_release_date">Data de lançamento: Fevereiro de 2025</string>
     <string name="version_changelog">Registro de alterações:</string>
@@ -41,9 +41,9 @@
     <!-- About Screen -->
     <string name="about">Sobre</string>
     <string name="about_screen">Tela Sobre</string>
-    <string name="about_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
-    <string name="about_details">Aqui você pode descrever o aplicativo, empresa ou qualquer outra informação relevante.</string>
-    <string name="about_contact">Contato: contact@example.com</string>
+    <string name="about_description">Saiba mais sobre o GoPlanifi e seus recursos.</string>
+    <string name="about_details">O GoPlanifi ajuda você a organizar e gerenciar suas viagens com facilidade.</string>
+    <string name="about_contact">Contato: support@goplanifi.com</string>
 
     <!-- List Example -->
     <string name="add_item">Adicionar item</string>
@@ -53,9 +53,12 @@
     <string name="quantity">Quantidade:</string>
     <string name="save">Salvar</string>
 
+    <!-- Main App Navigation -->
+    <string name="menu">Menu</string>
+    <string name="list">Lista</string>
 
+    <!-- Terms and Conditions -->
     <string name="terms_screen">Termos e Condições</string>
-    <string name="termsAppScreen">terms</string>
     <string name="terms_title">Termos e Condições</string>
     <string name="terms_intro">Leia atentamente estes termos antes de usar o aplicativo.</string>
     <string name="terms_usage">Política de Uso</string>
@@ -63,19 +66,13 @@
     <string name="terms_privacy">Política de Privacidade</string>
     <string name="terms_privacy_text">Estamos comprometidos em proteger seus dados e privacidade.</string>
     <string name="terms_contact">Informações de Contato</string>
-    <string name="terms_contact_text">Para qualquer dúvida, entre em contato pelo e-mail support@example.com.</string>
-
-
-
-    <!-- Main App Navigation -->
-    <string name="menu">Menu</string>
-    <string name="list">Lista</string>
+    <string name="terms_contact_text">Para qualquer dúvida, entre em contato pelo e-mail support@goplanifi.com.</string>
 
     <!-- Misc -->
     <string name="back_icon">Ícone de voltar</string>
-    <string name="add_trip">trip</string>
-    <string name="trip_name">trip_name</string>
-    <string name="trip_destination">trip_destination</string>
-    <string name="default_user">default_user</string>
-    <string name="default_pass">default_pass</string>
+    <string name="add_trip">Adicionar uma nova viagem</string>
+    <string name="trip_name">Nome da viagem</string>
+    <string name="trip_destination">Destino</string>
+    <string name="default_user">Usuário padrão</string>
+    <string name="default_pass">Senha padrão</string>
 </resources>

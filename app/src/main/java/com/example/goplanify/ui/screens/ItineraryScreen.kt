@@ -7,11 +7,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.goplanify.ui.viewmodel.ItineraryViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
+import com.example.goplanify.R
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +38,7 @@ fun ItineraryScreen(
     var tripEndDate by remember { mutableStateOf(trip?.endDate ?: "") }
 
     Scaffold(
-        topBar = { CommonTopBar(title = "Itinerary", navController) },
+        topBar = { CommonTopBar(title = stringResource(R.string.itinerary), navController) },
         bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
         Column(
@@ -46,8 +48,8 @@ fun ItineraryScreen(
                 .padding(16.dp)
         ) {
             // Display trip information
-            Text(text = "TripID: $tripId", modifier = Modifier.padding(bottom = 16.dp))
-            Text(text = "Trip to: ${trip?.destination}", modifier = Modifier.padding(bottom = 16.dp))
+            Text(text = stringResource(R.string.trip_name, tripId), modifier = Modifier.padding(bottom = 16.dp))
+            Text(text = stringResource(R.string.trip_destination, trip?.destination ?: ""), modifier = Modifier.padding(bottom = 16.dp))
 
             itineraries.forEach { itinerary ->
                 var isChecked by remember { mutableStateOf(selectedItineraries.contains(itinerary)) }
@@ -89,7 +91,7 @@ fun ItineraryScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Show date pickers for the main trip
-            Text(text = "Select dates for the main trip")
+            Text(text = stringResource(R.string.trip))
             DatePicker(
                 currentDate = tripStartDate,
                 onDateSelected = { selectedDate -> tripStartDate = selectedDate }
@@ -130,7 +132,7 @@ fun ItineraryScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Save Dates and Go Back")
+                Text(text = stringResource(R.string.save))
             }
         }
     }
@@ -167,6 +169,6 @@ fun DatePicker(
 
     // Show the date picker dialog
     Button(onClick = { datePickerDialog.value?.show() }) {
-        Text(text = if (selectedDate.value.isEmpty()) "Select Date" else selectedDate.value)
+        Text(text = if (selectedDate.value.isEmpty()) stringResource(R.string.add) else selectedDate.value)
     }
 }

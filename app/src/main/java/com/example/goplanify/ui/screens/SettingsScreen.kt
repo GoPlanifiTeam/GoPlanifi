@@ -53,7 +53,6 @@ fun SettingsScreen(
         ) {
             Text(text = "Settings", style = MaterialTheme.typography.headlineSmall)
 
-            // ✅ Notifications Toggle
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

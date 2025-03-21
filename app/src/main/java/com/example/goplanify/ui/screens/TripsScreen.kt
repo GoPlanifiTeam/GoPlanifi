@@ -48,24 +48,24 @@ fun TripsScreen(
             )
 
             if (selectedItineraries.isEmpty()) {
-                Text("No itineraries selected")
+                Text(stringResource(R.string.trip))
             } else {
                 selectedItineraries.forEach { itinerary ->
-                    Text("Itinerary: ${itinerary.name}, Location: ${itinerary.location}")
-                    Text("Start Date: ${itinerary.startDate}, End Date: ${itinerary.endDate}")
+                    Text(stringResource(R.string.itinerary) + ": ${itinerary.name}, " + stringResource(R.string.trip) + ": ${itinerary.location}")
+                    Text(stringResource(R.string.trip) + ": ${itinerary.startDate}, " + stringResource(R.string.trip) + ": ${itinerary.endDate}")
                 }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "Your Trips",
+                text = stringResource(R.string.listExample),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             
             if (trips.isEmpty()) {
-                Text("No trips available")
+                Text(stringResource(R.string.trip))
             } else {
                 trips.forEach { trip ->
                     TripCard(trip = trip, navController = navController, itineraryRoute = "ItineraryScreen")
@@ -88,9 +88,9 @@ fun TripCard(trip: Trip, navController: NavController, itineraryRoute: String) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = "Trip to ${trip.destination}")
-            Text(text = "Start Date: ${trip.startDate}")
-            Text(text = "End Date: ${trip.endDate}")
+            Text(text = stringResource(R.string.trip_destination, trip.destination))
+            Text(text = stringResource(R.string.trip) + ": ${trip.startDate}")
+            Text(text = stringResource(R.string.trip) + ": ${trip.endDate}")
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -114,19 +114,19 @@ fun BottomBar(navController: NavController) {
             icon = { Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.trip)) },
             selected = false,
             onClick = { navController.navigate("home") },
-            label = { Text(stringResource(R.string.trip)) }
+            label = { Text(stringResource(R.string.menu)) }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.FormatListNumbered, contentDescription = stringResource(R.string.trip)) },
             selected = false,
             onClick = { navController.navigate("tripsScreen") },
-            label = { Text(stringResource(R.string.trip)) }
+            label = { Text(stringResource(R.string.list)) }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.itinerary)) },
             selected = false,
             onClick = { navController.navigate("tripsScreen") },
-            label = { Text(stringResource(R.string.itinerary)) }
+            label = { Text(stringResource(R.string.profileScreen)) }
         )
     }
 }

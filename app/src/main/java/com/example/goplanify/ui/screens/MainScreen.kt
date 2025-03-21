@@ -44,7 +44,7 @@ fun MainScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Text(text = "Choose Your Travel Package", style = MaterialTheme.typography.headlineMedium)
+            Text(text = stringResource(R.string.trip), style = MaterialTheme.typography.headlineMedium)
 
             LazyColumn {
                 items(trips) { trip ->
@@ -68,28 +68,27 @@ fun DestinationCard(
     destination: String,
     itineraries: List<String>,
     navController: NavController,
-    tripViewModel: TripViewModel, // Recibe el tripViewModel aquí
+    tripViewModel: TripViewModel,
     itineraryViewModel: ItineraryViewModel,
     user: User
 ) {
-    val trip = tripViewModel.trips.collectAsState().value.find { it.destination == destination } // Buscar el viaje por destino
+    val trip = tripViewModel.trips.collectAsState().value.find { it.destination == destination }
 
-    if (trip != null) { // Si el viaje ya existe, navegamos a la pantalla de itinerarios
+    if (trip != null) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
                 .clickable {
-                    // Navegar al ItineraryScreen con el tripId del viaje existente
                     navController.navigate("ItineraryScreen/${trip.id}")
                 },
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Trip to ${trip.destination}", style = MaterialTheme.typography.titleLarge)
+                Text(text = stringResource(R.string.trip_destination, trip.destination), style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(text = "Things to do:", style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(R.string.itinerary), style = MaterialTheme.typography.bodyLarge)
                 trip.itineraries.forEach { activity ->
                     Text(text = "- ${activity.name}", style = MaterialTheme.typography.bodyMedium)
                 }
@@ -98,12 +97,11 @@ fun DestinationCard(
 
                 Button(
                     onClick = {
-                        // Si es necesario navegar o realizar alguna acción al hacer clic en el botón
                         navController.navigate("ItineraryScreen/${trip.id}")
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Select and Add to My Trips")
+                    Text(text = stringResource(R.string.add_trip))
                 }
             }
         }

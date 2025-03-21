@@ -15,9 +15,9 @@
     <!-- Profile Screen -->
     <string name="profile">Profile</string>
     <string name="profile_screen">Profile Screen</string>
-    <string name="profile_name">Name: John Doe</string>
-    <string name="profile_email">Email: john.doe@example.com</string>
-    <string name="profile_location">Location: Madrid, Spain</string>
+    <string name="profile_name">Name:</string>
+    <string name="profile_email">Email:</string>
+    <string name="profile_location">Location:</string>
     <string name="profile_info">Additional profile information, settings, photo, etc.</string>
 
     <!-- Settings Screen -->
@@ -31,7 +31,7 @@
     <!-- Version Screen -->
     <string name="version">Version</string>
     <string name="version_screen">Version Screen</string>
-    <string name="version_app_name">Application: MyApp</string>
+    <string name="version_app_name">Application: GoPlanifi</string>
     <string name="version_current">Current version: 1.0.0</string>
     <string name="version_release_date">Release Date: February 2025</string>
     <string name="version_changelog">Changelog:</string>
@@ -41,9 +41,9 @@
     <!-- About Screen -->
     <string name="about">About</string>
     <string name="about_screen">About Screen</string>
-    <string name="about_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
-    <string name="about_details">Here you describe the app, company, or anything else you want to display.</string>
-    <string name="about_contact">Contact: contact@example.com</string>
+    <string name="about_description">Learn more about GoPlanifi and its features.</string>
+    <string name="about_details">GoPlanifi helps you organize and manage your trips easily.</string>
+    <string name="about_contact">Contact: support@goplanifi.com</string>
 
     <!-- List Example -->
     <string name="add_item">Add Item</string>
@@ -57,9 +57,8 @@
     <string name="menu">Menu</string>
     <string name="list">List</string>
 
-
+    <!-- Terms and Conditions -->
     <string name="terms_screen">Terms And Conditions</string>
-    <string name="termsAppScreen">terms</string>
     <string name="terms_title">Terms and Conditions</string>
     <string name="terms_intro">Please read these terms carefully before using the app.</string>
     <string name="terms_usage">Usage Policy</string>
@@ -67,15 +66,13 @@
     <string name="terms_privacy">Privacy Policy</string>
     <string name="terms_privacy_text">We are committed to protecting your data and privacy.</string>
     <string name="terms_contact">Contact Information</string>
-    <string name="terms_contact_text">For any questions, reach out to support@example.com.</string>
-
-
+    <string name="terms_contact_text">For any questions, reach out to support@goplanifi.com.</string>
 
     <!-- Misc -->
     <string name="back_icon">Back Icon</string>
-    <string name="add_trip">trip</string>
-    <string name="trip_name">trip_name</string>
-    <string name="trip_destination">trip_destination</string>
-    <string name="default_user">default_user</string>
-    <string name="default_pass">default_pass</string>
+    <string name="add_trip">Add a New Trip</string>
+    <string name="trip_name">Trip Name</string>
+    <string name="trip_destination">Destination</string>
+    <string name="default_user">Default User</string>
+    <string name="default_pass">Default Password</string>
 </resources>

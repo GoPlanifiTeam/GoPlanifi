@@ -18,15 +18,14 @@ import com.example.goplanify.R
 fun VersionScreen(
     navController: NavController,
 ) {
-    // Hardcoded version information
+    // Use string resources for version information
     val versionInfo = VersionInfo(
-        appName = "Travel Planner",
-        version = "1.0.0",
-        releaseDate = "2025-03-20",
+        appName = stringResource(R.string.app_name),
+        version = stringResource(R.string.version_current),
+        releaseDate = stringResource(R.string.version_release_date),
         changelog = listOf(
-            "Initial release",
-            "Added trip management",
-            "User authentication support"
+            stringResource(R.string.version_changelog_login),
+            stringResource(R.string.version_changelog_performance)
         )
     )
 
@@ -42,13 +41,13 @@ fun VersionScreen(
         ) {
             // Display version information
             Text(versionInfo.appName, style = MaterialTheme.typography.headlineMedium)
-            Text("Version: ${versionInfo.version}")
-            Text("Release Date: ${versionInfo.releaseDate}")
+            Text(versionInfo.version)
+            Text(versionInfo.releaseDate)
 
             Divider(thickness = 1.dp)
-            Text("Changelog:")
+            Text(stringResource(R.string.version_changelog))
             versionInfo.changelog.forEach { change ->
-                Text("- $change")
+                Text(change)
             }
         }
     }
