@@ -1,27 +1,43 @@
 package com.example.travelplanner.domain.repository
 
 import com.example.travelplanner.domain.model.ItineraryItem
+import java.util.UUID
 
 class ItineraryRepository {
 
-    // Modify this method to fetch itineraries by tripId (String)
-    fun getItineraryItemsByTripId(tripId: String): List<ItineraryItem> {
-        // Here you can implement your actual logic to fetch itineraries based on the tripId
-        // For example, you can query a database, call an API, or use hardcoded data for now.
+    // Lista interna para almacenar itinerarios
+    private val itineraries = mutableListOf<ItineraryItem>()
 
-        // Example of hardcoded data for itineraries
-        return when (tripId) {
-            "1" -> listOf(
-                ItineraryItem(id = "1", name = "Explore the Eiffel Tower", location = "Eiffel Tower", startDate = "2025-06-01", endDate = "2025-06-03", trip = tripId),
-                ItineraryItem(id = "2", name = "Day trip to Versailles", location = "Versailles", startDate = "2025-06-04", endDate = "2025-06-05", trip = tripId)
-            )
-            "2" -> listOf(
-                ItineraryItem(id = "1", name = "Visit the Senso-ji Temple", location = "Senso-ji Temple", startDate = "2025-07-01", endDate = "2025-07-03", trip = tripId),
-                ItineraryItem(id = "2", name = "Explore Akihabara", location = "Akihabara", startDate = "2025-07-04", endDate = "2025-07-06", trip = tripId)
-            )
-            else -> emptyList() // No itineraries for unknown tripIds
+    fun addItineraryItem(tripId: String, activityName: String, location: String): ItineraryItem {
+        val newItem = ItineraryItem(
+            id = UUID.randomUUID().toString(),
+            name = activityName,
+            location = location,
+            startDate = "2025-01-01",
+            endDate = "2025-01-02",
+            trip = tripId
+        )
+
+        // Agregar el nuevo itinerario a la lista interna
+        itineraries.add(newItem)
+
+        return newItem
+    }
+
+    // Eliminar un itinerario basado en el id
+    fun deleteItineraryItem(itineraryId: String): Boolean {
+        val itemToRemove = itineraries.find { it.id == itineraryId }
+        return if (itemToRemove != null) {
+            itineraries.remove(itemToRemove) // Elimina el itinerario de la lista
+            true
+        } else {
+            false
         }
     }
 
-    // Optionally, if you have functionality to add or delete itinerary items, you can add those here.
+    // Obtener itinerarios por tripId
+    fun getItineraryItemsByTripId(tripId: String): List<ItineraryItem> {
+        return itineraries.filter { it.trip == tripId }
+    }
 }
+

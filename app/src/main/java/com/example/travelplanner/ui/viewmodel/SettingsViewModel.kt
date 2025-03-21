@@ -7,10 +7,12 @@ import com.example.travelplanner.domain.model.Preferences
 import com.example.travelplanner.domain.model.User
 import com.example.travelplanner.domain.repository.PreferencesRepository
 import com.example.travelplanner.ui.screens.setLocale
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import java.util.Locale
+import javax.inject.Inject
 
 // ✅ Define Settings UI State
 data class SettingsState(
@@ -18,7 +20,10 @@ data class SettingsState(
     val selectedLanguage: String = "en"
 )
 
-class SettingsViewModel(private val preferencesRepository: PreferencesRepository) : ViewModel() {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val preferencesRepository: PreferencesRepository
+) : ViewModel() {
     private val _settingsState = MutableStateFlow(SettingsState())
     val settingsState: StateFlow<SettingsState> get() = _settingsState
 
@@ -46,7 +51,6 @@ class SettingsViewModel(private val preferencesRepository: PreferencesRepository
         // ✅ Force a UI recomposition by resetting the state
         _settingsState.value = _settingsState.value.copy(selectedLanguage = language)
     }
-
 
     fun getSavedLanguage(context: Context): String {
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)

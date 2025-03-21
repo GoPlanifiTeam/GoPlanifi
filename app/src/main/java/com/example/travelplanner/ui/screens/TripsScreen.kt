@@ -14,19 +14,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.travelplanner.R
 import com.example.travelplanner.domain.model.Trip
+import com.example.travelplanner.ui.viewmodel.ItineraryViewModel
 import com.example.travelplanner.ui.viewmodel.TripViewModel
 
 @Composable
 fun TripsScreen(navController: NavController) {
-    val tripViewModel: TripViewModel = viewModel()
-
-    // Get trips from ViewModel
-    val trips by tripViewModel.trips.collectAsState()
-    val itineraryRoute = stringResource(R.string.trip) // Fetching itinerary route
+    val itineraryViewModel: ItineraryViewModel = viewModel()
+    // Get selected itineraries from the ViewModel
+    val selectedItineraries by itineraryViewModel.selectedItineraries.collectAsState()
 
     Scaffold(
-        topBar = { CommonTopBar(title = stringResource(R.string.trip),navController) },
-        bottomBar = { BottomBar(navController) } // Se agregó el BottomBar aquí
+        topBar = { CommonTopBar(title = stringResource(R.string.trip), navController) },
+        bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -39,12 +38,12 @@ fun TripsScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Mostrar los viajes en una lista
-            if (trips.isEmpty()) {
-                Text(stringResource(R.string.trip))
+            if (selectedItineraries.isEmpty()) {
+                Text("No itineraries selecteds")
             } else {
-                trips.forEach { trip ->
-                    TripCard(trip = trip, navController = navController, itineraryRoute = itineraryRoute)
+                selectedItineraries.forEach { itinerary ->
+                    Text("Itinerary: ${itinerary.name}, Location: ${itinerary.location}")
+                    Text("Start Date: ${itinerary.startDate}, End Date: ${itinerary.endDate}")
                 }
             }
         }

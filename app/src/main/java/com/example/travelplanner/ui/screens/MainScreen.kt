@@ -1,5 +1,6 @@
 package com.example.travelplanner.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,28 +36,14 @@ import java.util.UUID
 import com.example.travelplanner.domain.model.Trip
 import com.example.travelplanner.domain.model.Map
 import com.example.travelplanner.domain.model.User
+import com.example.travelplanner.domain.repository.TripRepository
+
 @Composable
-fun MainScreen(navController: NavController) {
-    val tripViewModel: TripViewModel = viewModel()
+fun MainScreen(navController: NavController, tripViewModel: TripViewModel) {
+    val tripRepository = TripRepository() // Usamos TripRepository para manejar los viajes
     val itineraryViewModel: ItineraryViewModel = viewModel()
 
-    val testUser = User(
-        userId = "testUser123",
-        email = "testuser@example.com",
-        password = "password",
-        firstName = "Test",
-        lastName = "User",
-        trips = emptyList(),
-        imageURL = "https://example.com/user-avatar.png"
-    )
-
-    val destinations = listOf(
-        "Paris" to listOf("Visit Eiffel Tower", "Louvre Museum", "Seine River Cruise"),
-        "New York" to listOf("Times Square", "Statue of Liberty", "Central Park"),
-        "Tokyo" to listOf("Shibuya Crossing", "Mount Fuji Day Trip", "Akihabara Shopping"),
-        "London" to listOf("Big Ben", "London Eye", "Tower of London"),
-        "Rome" to listOf("Colosseum", "Vatican Museums", "Trevi Fountain")
-    )
+    val trips = tripRepository.getTrips()  // Obtener la lista de viajes desde el repositorio
 
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.mainApp), navController) },
@@ -71,103 +58,74 @@ fun MainScreen(navController: NavController) {
             Text(text = "Choose Your Travel Package", style = MaterialTheme.typography.headlineMedium)
 
             LazyColumn {
-                items(destinations) { (destination, itineraries) ->
-                    DestinationCard(destination, itineraries, navController, tripViewModel, itineraryViewModel, testUser)
+                items(trips) { trip -> // Usamos los viajes obtenidos del repositorio
+                    DestinationCard(
+                        destination = trip.destination,
+                        itineraries = trip.itineraries.map { it.name },
+                        navController = navController,
+                        tripViewModel = tripViewModel,  // Pasa el TripViewModel a DestinationCard
+                        itineraryViewModel = itineraryViewModel,
+                        user = trip.user
+                    )
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun DestinationCard(
     destination: String,
     itineraries: List<String>,
     navController: NavController,
-    tripViewModel: TripViewModel,
+    tripViewModel: TripViewModel, // Recibe el tripViewModel aquí
     itineraryViewModel: ItineraryViewModel,
     user: User
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable {
-                val tripId = UUID.randomUUID().toString()
+    val trip = tripViewModel.trips.collectAsState().value.find { it.destination == destination } // Buscar el viaje por destino
 
-                val tripMap = Map(latitud = 0.0, longitud = 0.0, direction = "Unknown")
+    if (trip != null) { // Si el viaje ya existe, navegamos a la pantalla de itinerarios
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .clickable {
+                    // Navegar al ItineraryScreen con el tripId del viaje existente
+                    navController.navigate("ItineraryScreen/${trip.id}")
+                },
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Trip to ${trip.destination}", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(8.dp))
 
-                val newTrip = Trip(
-                    id = tripId,
-                    destination = destination,
-                    startDate = "2025-06-01",
-                    endDate = "2025-06-10",
-                    user = user,
-                    map = tripMap,
-                    itineraries = emptyList(),
-                    images = emptyList(),
-                    aiRecommendations = emptyList()
-                )
-
-                tripViewModel.addTrip(newTrip)
-
-                itineraries.forEach { activity ->
-                    itineraryViewModel.addItineraryItem(tripId, activity, destination)
+                Text(text = "Things to do:", style = MaterialTheme.typography.bodyLarge)
+                trip.itineraries.forEach { activity ->
+                    Text(text = "- ${activity.name}", style = MaterialTheme.typography.bodyMedium)
                 }
 
-                navController.navigate("tripsScreen")
-            },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Trip to $destination", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(text = "Things to do:", style = MaterialTheme.typography.bodyLarge)
-            itineraries.forEach { activity ->
-                Text(text = "- $activity", style = MaterialTheme.typography.bodyMedium)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Button(
-                onClick = {
-                    val tripId = UUID.randomUUID().toString()
-
-                    val tripMap = com.example.travelplanner.domain.model.Map(
-                        latitud = 0.0,
-                        longitud = 0.0,
-                        direction = "Unknown"
-                    )
-
-                    val newTrip = Trip(
-                        id = tripId,
-                        destination = destination,
-                        startDate = "2025-06-01",
-                        endDate = "2025-06-10",
-                        user = user,
-                        map = tripMap,
-                        itineraries = emptyList(),
-                        images = emptyList(),
-                        aiRecommendations = emptyList()
-                    )
-
-                    tripViewModel.addTrip(newTrip)
-
-                    itineraries.forEach { activity ->
-                        itineraryViewModel.addItineraryItem(tripId, activity, destination)
-                    }
-
-                    navController.navigate("tripsScreen")
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Select and Add to My Trips")
+                Button(
+                    onClick = {
+                        // Si es necesario navegar o realizar alguna acción al hacer clic en el botón
+                        navController.navigate("ItineraryScreen/${trip.id}")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Select and Add to My Trips")
+                }
             }
         }
+    } else {
+        // Si no existe el viaje, puedes mostrar un mensaje o permitir crear uno nuevo
     }
 }
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopBar(title: String, navController: NavController) {
