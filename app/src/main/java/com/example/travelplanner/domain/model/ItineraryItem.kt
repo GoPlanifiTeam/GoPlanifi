@@ -1,7 +1,7 @@
-package com.example.travelplanner.domain
+package com.example.travelplanner.domain.model
 
 data class ItineraryItem(
-    val trip: Trip,
+    val trip: String,
     val id: String,
     val name: String,
     val location: String,

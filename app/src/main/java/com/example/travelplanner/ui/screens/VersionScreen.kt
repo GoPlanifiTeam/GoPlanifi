@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,9 +14,23 @@ import com.example.travelplanner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VersionScreen(navController: NavController) {
+fun VersionScreen(
+    navController: NavController,
+) {
+    // Hardcoded version information
+    val versionInfo = VersionInfo(
+        appName = "Travel Planner",
+        version = "1.0.0",
+        releaseDate = "2025-03-20",
+        changelog = listOf(
+            "Initial release",
+            "Added trip management",
+            "User authentication support"
+        )
+    )
+
     Scaffold(
-        topBar = { CommonTopBar(title = stringResource(R.string.versionScreen), navController) }, // ✅ Now using `CommonTopBar`
+        topBar = { CommonTopBar(title = stringResource(R.string.versionScreen), navController) },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -27,14 +39,24 @@ fun VersionScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = stringResource(R.string.version_screen), style = MaterialTheme.typography.headlineMedium) // "Version Screen"
-            Text(text = stringResource(R.string.version_app_name)) // "Application: MyApp"
-            Text(text = stringResource(R.string.version_current)) // "Current version: 1.0.0"
-            Text(text = stringResource(R.string.version_release_date)) // "Release Date: February 2025"
+            // Display version information
+            Text(versionInfo.appName, style = MaterialTheme.typography.headlineMedium)
+            Text("Version: ${versionInfo.version}")
+            Text("Release Date: ${versionInfo.releaseDate}")
+
             Divider(thickness = 1.dp)
-            Text(text = stringResource(R.string.version_changelog)) // "Changelog:"
-            Text(text = stringResource(R.string.version_changelog_login)) // "- Added login screen"
-            Text(text = stringResource(R.string.version_changelog_performance)) // "- Performance improvements"
+            Text("Changelog:")
+            versionInfo.changelog.forEach { change ->
+                Text("- $change")
+            }
         }
     }
 }
+
+// Data class to represent version information
+data class VersionInfo(
+    val appName: String,
+    val version: String,
+    val releaseDate: String,
+    val changelog: List<String>
+)

@@ -1,34 +1,60 @@
 package com.example.travelplanner
 
-
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.travelplanner.ui.screens.AboutScreen
-import com.example.travelplanner.ui.screens.mainAppPage
 import com.example.travelplanner.ui.screens.ProfileScreen
 import com.example.travelplanner.ui.screens.SettingsScreen
 import com.example.travelplanner.ui.screens.VersionScreen
 import com.example.travelplanner.ui.screens.TermsAndConditionsScreen
+import com.example.travelplanner.ui.screens.ItineraryScreen
+import com.example.travelplanner.ui.screens.TripsScreen
+import com.example.travelplanner.ui.screens.MainScreen
+import com.example.travelplanner.ui.screens.LoginScreen
+import com.example.travelplanner.ui.viewmodel.TripViewModel
+import com.example.travelplanner.domain.repository.TripRepository
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    val homeRoute = stringResource(R.string.mainApp) // Get localized route name
-    val aboutRoute = stringResource(R.string.aboutScreen) // Get localized route name
-    val versionRoute = stringResource(R.string.versionScreen) // Get localized route name
-    val profileRoute = stringResource(R.string.profileScreen) // Get localized route name
-    val settingsRoute = stringResource(R.string.settingsScreen) // Get localized route name
-    val termsRoute = stringResource(R.string.termsAppScreen) // Get localized route name
+    val homeRoute = "Home" // "Home"
+    val aboutRoute = "About" // "About"
+    val versionRoute = "Version" // "Version"
+    val profileRoute = "Profile" // "Profile"
+    val settingsRoute = "Settings" // "Settings"
+    val termsRoute = "Terms" // "Terms & Conditions"
+    val itineraryRoute = "itineraryScreen/{tripId}" // Using tripId as parameter
+    val tripsRoute = "tripsScreen" // Trips screen route
+    val loginRoute = "loginScreen" // Trips screen route
 
-    NavHost(navController = navController, startDestination = "home") {
+    // Crea el tripViewModel aquí para ser accesible en todas las pantallas
 
-        composable(homeRoute) { mainAppPage(navController) }
+    val tripViewModel: TripViewModel = viewModel()
+    tripViewModel.fetchTrips()
+
+    NavHost(navController = navController, startDestination = "loginScreen") {
+        // Main Screen
+        composable(homeRoute) { MainScreen(navController, tripViewModel) }
+
+        // Other screens
         composable(aboutRoute) { AboutScreen(navController) }
         composable(versionRoute) { VersionScreen(navController) }
         composable(profileRoute) { ProfileScreen(navController) }
         composable(settingsRoute) { SettingsScreen(navController) }
         composable(termsRoute) { TermsAndConditionsScreen(navController) }
+        composable(loginRoute) { LoginScreen(navController) }
+
+        // Itinerary screen with tripId as a parameter, pass tripViewModel
+        composable(itineraryRoute) { backStackEntry ->
+            val tripId = backStackEntry.arguments?.getString("tripId")
+            if (tripId != null) {
+                ItineraryScreen(navController, tripId, tripViewModel) // Pasa el tripViewModel
+            }
+        }
+        // Trips screen
+        composable(tripsRoute) { TripsScreen(navController) }
     }
 }

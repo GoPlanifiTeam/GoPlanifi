@@ -1,6 +1,10 @@
 package com.example.travelplanner.ui.screens
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -20,106 +24,107 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.travelplanner.NavGraph
 import com.example.travelplanner.R
+import com.example.travelplanner.ui.viewmodel.ItineraryViewModel
+import com.example.travelplanner.ui.viewmodel.TripViewModel
+import androidx.compose.material.icons.filled.*
+import java.util.UUID
+import com.example.travelplanner.domain.model.Trip
+import com.example.travelplanner.domain.model.Map
+import com.example.travelplanner.domain.model.User
+import com.example.travelplanner.domain.repository.TripRepository
 
-// Enum para representar el modo seleccionado
-enum class DisplayMode {
-    Trip, Itinerary, UserPreferences
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun mainAppPage(navController: NavController) {
-    var selectedDisplayMode by remember { mutableStateOf(DisplayMode.Trip) }
+fun MainScreen(navController: NavController, tripViewModel: TripViewModel) {
+    val tripRepository = TripRepository() // Usamos TripRepository para manejar los viajes
+    val itineraryViewModel: ItineraryViewModel = viewModel()
+
+    val trips = tripRepository.getTrips()  // Obtener la lista de viajes desde el repositorio
 
     Scaffold(
-        topBar = { CommonTopBar(title = stringResource(R.string.mainApp), navController) }, // ✅ Using `CommonTopBar`
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {  },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Text(stringResource(R.string.fab)) // "FAB"
-            }
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.trip)) },
-                    selected = selectedDisplayMode == DisplayMode.Trip,
-                    onClick = { selectedDisplayMode = DisplayMode.Trip },
-                    label = { Text(stringResource(R.string.trip)) } // "Trip"
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Scale, contentDescription = stringResource(R.string.itinerary)) },
-                    selected = selectedDisplayMode == DisplayMode.Itinerary,
-                    onClick = { selectedDisplayMode = DisplayMode.Itinerary },
-                    label = { Text(stringResource(R.string.itinerary)) } // "Itinerary"
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.FormatListNumbered, contentDescription = stringResource(R.string.list)) },
-                    selected = selectedDisplayMode == DisplayMode.UserPreferences,
-                    onClick = { selectedDisplayMode = DisplayMode.UserPreferences },
-                    label = { Text(stringResource(R.string.listExample)) } // "List"
-                )
-            }
-        }
-    ) { innerPadding ->
-        Box(
+        topBar = { CommonTopBar(title = stringResource(R.string.mainApp), navController) },
+        bottomBar = { BottomBar(navController) }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            when (selectedDisplayMode) {
-                DisplayMode.Trip -> Trip()
-                DisplayMode.Itinerary -> Itinerary()
-                DisplayMode.UserPreferences -> UserPreferences()
+            Text(text = "Choose Your Travel Package", style = MaterialTheme.typography.headlineMedium)
+
+            LazyColumn {
+                items(trips) { trip -> // Usamos los viajes obtenidos del repositorio
+                    DestinationCard(
+                        destination = trip.destination,
+                        itineraries = trip.itineraries.map { it.name },
+                        navController = navController,
+                        tripViewModel = tripViewModel,  // Pasa el TripViewModel a DestinationCard
+                        itineraryViewModel = itineraryViewModel,
+                        user = trip.user
+                    )
+                }
             }
         }
     }
 }
 
+
 @Composable
-fun Trip() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = stringResource(R.string.trip), style = MaterialTheme.typography.headlineMedium ) // "Trip"
+fun DestinationCard(
+    destination: String,
+    itineraries: List<String>,
+    navController: NavController,
+    tripViewModel: TripViewModel, // Recibe el tripViewModel aquí
+    itineraryViewModel: ItineraryViewModel,
+    user: User
+) {
+    val trip = tripViewModel.trips.collectAsState().value.find { it.destination == destination } // Buscar el viaje por destino
+
+    if (trip != null) { // Si el viaje ya existe, navegamos a la pantalla de itinerarios
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .clickable {
+                    // Navegar al ItineraryScreen con el tripId del viaje existente
+                    navController.navigate("ItineraryScreen/${trip.id}")
+                },
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Trip to ${trip.destination}", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(text = "Things to do:", style = MaterialTheme.typography.bodyLarge)
+                trip.itineraries.forEach { activity ->
+                    Text(text = "- ${activity.name}", style = MaterialTheme.typography.bodyMedium)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = {
+                        // Si es necesario navegar o realizar alguna acción al hacer clic en el botón
+                        navController.navigate("ItineraryScreen/${trip.id}")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Select and Add to My Trips")
+                }
+            }
+        }
+    } else {
+        // Si no existe el viaje, puedes mostrar un mensaje o permitir crear uno nuevo
     }
 }
 
-@Composable
-fun Itinerary() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = stringResource(R.string.itinerary), style = MaterialTheme.typography.headlineMedium ) // "Itinerary"
-    }
-}
 
-@Composable
-fun UserPreferences() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = stringResource(R.string.listExample), style = MaterialTheme.typography.headlineMedium ) // "User Preferences"
 
-        ListApp()
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

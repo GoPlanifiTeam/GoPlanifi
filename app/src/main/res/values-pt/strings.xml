@@ -73,4 +73,9 @@
 
     <!-- Misc -->
     <string name="back_icon">Ícone de voltar</string>
+    <string name="add_trip">trip</string>
+    <string name="trip_name">trip_name</string>
+    <string name="trip_destination">trip_destination</string>
+    <string name="default_user">default_user</string>
+    <string name="default_pass">default_pass</string>
 </resources>
