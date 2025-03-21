@@ -15,9 +15,9 @@
     <!-- Profile Screen -->
     <string name="profile">Profil</string>
     <string name="profile_screen">Écran de profil</string>
-    <string name="profile_name">Nom: John Doe</string>
-    <string name="profile_email">E-mail: john.doe@example.com</string>
-    <string name="profile_location">Localisation: Madrid, Espagne</string>
+    <string name="profile_name">Nom :</string>
+    <string name="profile_email">E-mail :</string>
+    <string name="profile_location">Localisation :</string>
     <string name="profile_info">Informations supplémentaires du profil, paramètres, photo, etc.</string>
 
     <!-- Settings Screen -->
@@ -31,9 +31,9 @@
     <!-- Version Screen -->
     <string name="version">Version</string>
     <string name="version_screen">Écran de version</string>
-    <string name="version_app_name">Application: MyApp</string>
-    <string name="version_current">Version actuelle: 1.0.0</string>
-    <string name="version_release_date">Date de sortie: Février 2025</string>
+    <string name="version_app_name">Application : GoPlanifi</string>
+    <string name="version_current">Version actuelle : 1.0.0</string>
+    <string name="version_release_date">Date de sortie : Février 2025</string>
     <string name="version_changelog">Journal des modifications :</string>
     <string name="version_changelog_login">- Ajout de l\'écran de connexion</string>
     <string name="version_changelog_performance">- Améliorations des performances</string>
@@ -41,9 +41,9 @@
     <!-- About Screen -->
     <string name="about">À propos</string>
     <string name="about_screen">Écran d\'information</string>
-    <string name="about_description">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
-    <string name="about_details">Ici, vous pouvez décrire l\'application, l\'entreprise ou toute autre information pertinente.</string>
-    <string name="about_contact">Contact: contact@example.com</string>
+    <string name="about_description">En savoir plus sur GoPlanifi et ses fonctionnalités.</string>
+    <string name="about_details">GoPlanifi vous aide à organiser et gérer vos voyages facilement.</string>
+    <string name="about_contact">Contact : support@goplanifi.com</string>
 
     <!-- List Example -->
     <string name="add_item">Ajouter un élément</string>
@@ -55,28 +55,24 @@
 
     <!-- Main App Navigation -->
     <string name="menu">Menu</string>
-
     <string name="list">Liste</string>
 
+    <!-- Terms and Conditions -->
     <string name="terms_screen">Conditions Générales</string>
-    <string name="termsAppScreen">terms</string>
-    <string name="terms_title">Conditions Générales d\'Utilisation</string>
-    <string name="terms_intro">Veuillez lire attentivement ces conditions</string>
-    <string name="terms_usage">Politique d\'Utilisation</string>
+    <string name="terms_title">Conditions Générales</string>
+    <string name="terms_intro">Veuillez lire attentivement ces conditions avant d\'utiliser l\'application.</string>
+    <string name="terms_usage">Politique d\'utilisation</string>
     <string name="terms_usage_text">En utilisant cette application, vous acceptez de respecter toutes les règles et réglementations.</string>
-    <string name="terms_privacy">Politique de Confidentialité</string>
+    <string name="terms_privacy">Politique de confidentialité</string>
     <string name="terms_privacy_text">Nous nous engageons à protéger vos données et votre confidentialité.</string>
-    <string name="terms_contact">Informations de Contact</string>
-    <string name="terms_contact_text">Pour toute question, contactez-nous à support@example.com.</string>
-
-
+    <string name="terms_contact">Informations de contact</string>
+    <string name="terms_contact_text">Pour toute question, contactez-nous à support@goplanifi.com.</string>
 
     <!-- Misc -->
     <string name="back_icon">Icône de retour</string>
-    <string name="add_trip">trip</string>
-    <string name="trip_name">trip_name</string>
-    <string name="trip_destination">trip_destination</string>
-    <string name="default_user">default_user</string>
-    <string name="default_pass">default_pass</string>
-
+    <string name="add_trip">Ajouter un nouveau voyage</string>
+    <string name="trip_name">Nom du voyage</string>
+    <string name="trip_destination">Destination</string>
+    <string name="default_user">Utilisateur par défaut</string>
+    <string name="default_pass">Mot de passe par défaut</string>
 </resources>
