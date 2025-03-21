@@ -7,5 +7,5 @@ data class User(
     var firstName: String,
     var lastName: String,
     val trips: List<Trip>,
-    val imageURL: String
+    val imageURL: String?
 )
