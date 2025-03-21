@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -11,17 +13,21 @@ android {
         exclude("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
     }
 
-    namespace = "com.example.travelplanner"
+    namespace = "com.example.goplanify"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.travelplanner"
+        applicationId = "com.example.goplanify"
         minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures{
+        buildConfig = true
     }
 
     buildTypes {
@@ -43,11 +49,15 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // Add this to fix Hilt compiler issues
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.core.ktx)
@@ -69,4 +79,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    
+    // Add Hilt navigation and viewmodel support
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    
 }
