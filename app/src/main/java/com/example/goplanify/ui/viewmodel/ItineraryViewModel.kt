@@ -35,15 +35,17 @@ class ItineraryViewModel @Inject constructor(
     }
 
     // Add a new itinerary item using the repository
-    fun addItineraryItem(tripId: String, activityName: String, location: String) {
-        val newItem = repository.addItineraryItem(tripId, activityName, location)
-        _itineraries.value += newItem
+    fun addItineraryItem(tripId: String, activityName: String, location: String, startDate: String, endDate: String) {
+        val result = repository.addItineraryItem(tripId, activityName, location, startDate, endDate)
+        result.onSuccess { newItem ->
+            _itineraries.value = _itineraries.value + newItem
+        }
     }
 
     // Method to delete an itinerary item using the repository
     fun deleteItineraryItem(itineraryId: String) {
-        val success = repository.deleteItineraryItem(itineraryId)
-        if (success) {
+        val result = repository.deleteItineraryItem(itineraryId)
+        result.onSuccess {
             _itineraries.value = _itineraries.value.filter { it.id != itineraryId }
         }
     }

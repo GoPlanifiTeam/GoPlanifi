@@ -3,25 +3,84 @@ package com.example.goplanify.domain.repository
 import com.example.goplanify.domain.model.ItineraryItem
 import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.domain.model.User
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TripRepository @Inject constructor() {
     private val trips = mutableListOf<Trip>()
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-        // Other functions to manage trips
-        fun addTrip(trip: Trip) {
-            trips.add(trip)
+    fun addTrip(trip: Trip): Result<Trip> {
+        return when {
+            trip.destination.isBlank() ->
+                Result.failure(IllegalArgumentException("Destination cannot be empty"))
+            trip.user.userId.isBlank() ->
+                Result.failure(IllegalArgumentException("User ID cannot be empty"))
+            trip.startDate.isBlank() ->
+                Result.failure(IllegalArgumentException("Start date cannot be empty"))
+            trip.endDate.isBlank() ->
+                Result.failure(IllegalArgumentException("End date cannot be empty"))
+            !isValidDateFormat(trip.startDate) ->
+                Result.failure(IllegalArgumentException("Invalid start date format. Use yyyy-MM-dd"))
+            !isValidDateFormat(trip.endDate) ->
+                Result.failure(IllegalArgumentException("Invalid end date format. Use yyyy-MM-dd"))
+            !isDateInFuture(trip.startDate) ->
+                Result.failure(IllegalArgumentException("Start date must be in the future"))
+            !isStartDateBeforeEndDate(trip.startDate, trip.endDate) ->
+                Result.failure(IllegalArgumentException("End date must be after start date"))
+            else -> {
+                trips.add(trip)
+                Result.success(trip)
+            }
         }
+    }
 
-        fun getTripsByUser(user: User): List<Trip> {
-            return trips.filter { it.user == user }
-        }
+    fun getTripsByUser(user: User): List<Trip> {
+        return trips.filter { it.user.userId == user.userId }
+    }
 
-        fun deleteTrip(tripId: String) {
-            trips.removeIf { it.id == tripId }
+    fun deleteTrip(tripId: String): Result<Boolean> {
+        val removed = trips.removeIf { it.id == tripId }
+        return if (removed) {
+            Result.success(true)
+        } else {
+            Result.failure(IllegalArgumentException("Trip not found"))
         }
+    }
+
+    fun getTripById(tripId: String): Result<Trip> {
+        val trip = trips.find { it.id == tripId }
+        return if (trip != null) {
+            Result.success(trip)
+        } else {
+            Result.failure(IllegalArgumentException("Trip not found"))
+        }
+    }
+
+    private fun isValidDateFormat(dateStr: String): Boolean {
+        return try {
+            LocalDate.parse(dateStr, dateFormatter)
+            true
+        } catch (e: DateTimeParseException) {
+            false
+        }
+    }
+
+    private fun isDateInFuture(dateStr: String): Boolean {
+        val date = LocalDate.parse(dateStr, dateFormatter)
+        return date.isAfter(LocalDate.now())
+    }
+
+    private fun isStartDateBeforeEndDate(startDateStr: String, endDateStr: String): Boolean {
+        val startDate = LocalDate.parse(startDateStr, dateFormatter)
+        val endDate = LocalDate.parse(endDateStr, dateFormatter)
+        return startDate.isBefore(endDate) || startDate.isEqual(endDate)
+    }
+
 
     // Function to fetch trips (static list for now)
         fun getTrips(): List<Trip> {
