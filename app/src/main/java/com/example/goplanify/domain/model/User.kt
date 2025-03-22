@@ -6,6 +6,6 @@ data class User(
     var password: String,
     var firstName: String,
     var lastName: String,
-    val trips: List<Trip>,
+    val trips: List<Trip>?,
     val imageURL: String?
 )

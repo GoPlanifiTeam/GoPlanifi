@@ -1,10 +1,7 @@
 package com.example.goplanify.di
 
-import com.example.goplanify.domain.repository.AIRecommendationsRepository
 import com.example.goplanify.domain.repository.AuthenticationRepository
-import com.example.goplanify.domain.repository.ImageRepository
 import com.example.goplanify.domain.repository.ItineraryRepository
-import com.example.goplanify.domain.repository.MapRepository
 import com.example.goplanify.domain.repository.PreferencesRepository
 import com.example.goplanify.domain.repository.TripRepository
 import dagger.Module
@@ -35,17 +32,7 @@ object AppModule {
         return PreferencesRepository()
     }
 
-    @Provides
-    @Singleton
-    fun provideImageRepository(): ImageRepository {
-        return ImageRepository()
-    }
 
-    @Provides
-    @Singleton
-    fun provideMapRepository(): MapRepository {
-        return MapRepository()
-    }
 
     @Provides
     @Singleton
@@ -53,9 +40,4 @@ object AppModule {
         return AuthenticationRepository()
     }
 
-    @Provides
-    @Singleton
-    fun provideAIRecommendationsRepository(): AIRecommendationsRepository {
-        return AIRecommendationsRepository()
-    }
 }

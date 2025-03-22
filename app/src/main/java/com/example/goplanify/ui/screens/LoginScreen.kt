@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.example.goplanify.domain.model.User
 import com.example.goplanify.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.goplanify.ui.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
@@ -30,8 +31,8 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
             authViewModel.initializeTestUser(
                 User(
                     userId = "testUser123",
-                    email = "test@test.com",
-                    password = "defaultPass",
+                    email = "test@test.com", //Este es el default user
+                    password = "defaultPass", // Esta es la contraseña
                     firstName = "Test",
                     lastName = "User",
                     trips = emptyList(),

@@ -16,16 +16,16 @@ import javax.inject.Inject
 
 data class SettingsState(
     val notificationsEnabled: Boolean = true,
-    val selectedLanguage: String = "en"
+    val selectedLanguage: String = "es"
 )
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val preferencesRepository: PreferencesRepository
-) : ViewModel() {
+    private val preferencesRepository: PreferencesRepository) : ViewModel() {
     private val _settingsState = MutableStateFlow(SettingsState())
     val settingsState: StateFlow<SettingsState> get() = _settingsState
 
+    // Cargar las preferencias del usuario
     fun loadPreferences(user: User) {
         preferencesRepository.getPreferences(user)?.let { savedPreferences ->
             _settingsState.value = SettingsState(
@@ -40,17 +40,19 @@ class SettingsViewModel @Inject constructor(
         preferencesRepository.toggleNotifications(user, enabled)
     }
 
+    // Cambiar el idioma y guardar la preferencia
     fun changeLanguage(user: User, language: String, context: Context) {
         _settingsState.update { it.copy(selectedLanguage = language) }
         preferencesRepository.savePreferences(user, Preferences(user, _settingsState.value.notificationsEnabled, language, "default"))
-
         setLocale(context, language)
-
         _settingsState.value = _settingsState.value.copy(selectedLanguage = language)
     }
 
+
+    // Método para obtener el idioma desde SharedPreferences si se desea
     fun getSavedLanguage(context: Context): String {
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        return sharedPreferences.getString("language", Locale.getDefault().language) ?: "en"
+        return sharedPreferences.getString("language", Locale.getDefault().language) ?: "pt"
     }
+
 }
