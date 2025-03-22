@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">GoPlanifi</string>
-    <string name="trip">Viaje</string>
+    <string name="trip">¡Explora nuestros viajes listos para usar!</string>
     <string name="itinerary">Itinerario</string>
     <string name="userPreference">Preferencias del usuario</string>
     <string name="welcome">Bienvenido a</string>
@@ -9,44 +9,44 @@
     <string name="listExample">Mis viajes</string>
     <string name="profileScreen">Perfil</string>
     <string name="mainApp">Inicio</string>
-    <string name="settingsScreen">Configuraciones</string>
+    <string name="settingsScreen">Configuración</string>
     <string name="versionScreen">Versión</string>
 
     <!-- Profile Screen -->
     <string name="profile">Perfil</string>
     <string name="profile_screen">Pantalla de perfil</string>
     <string name="profile_name">Nombre:</string>
-    <string name="profile_email">Correo:</string>
+    <string name="profile_email">Correo electrónico:</string>
     <string name="profile_location">Ubicación:</string>
-    <string name="profile_info">Información adicional del perfil, configuraciones, foto, etc.</string>
+    <string name="profile_info">Información adicional del perfil, configuración, foto, etc.</string>
 
     <!-- Settings Screen -->
-    <string name="settings">Configuraciones</string>
+    <string name="settings">Configuración</string>
     <string name="settings_screen">Pantalla de configuración</string>
     <string name="settings_notifications">Configuración de notificaciones</string>
     <string name="settings_language">Configuración de idioma</string>
-    <string name="settings_theme">Tema oscuro o claro</string>
-    <string name="settings_advanced">Configuraciones avanzadas…</string>
+    <string name="settings_theme">Tema claro u oscuro</string>
+    <string name="settings_advanced">Más configuraciones avanzadas…</string>
 
     <!-- Version Screen -->
     <string name="version">Versión</string>
     <string name="version_screen">Pantalla de versión</string>
     <string name="version_app_name">Aplicación: GoPlanifi</string>
     <string name="version_current">Versión actual: 1.0.0</string>
-    <string name="version_release_date">Fecha de lanzamiento: Febrero 2025</string>
+    <string name="version_release_date">Fecha de lanzamiento: febrero 2025</string>
     <string name="version_changelog">Registro de cambios:</string>
-    <string name="version_changelog_login">- Se agregó la pantalla de inicio de sesión</string>
-    <string name="version_changelog_performance">- Mejoras en el rendimiento</string>
+    <string name="version_changelog_login">- Se agregó pantalla de inicio de sesión</string>
+    <string name="version_changelog_performance">- Mejoras de rendimiento</string>
 
     <!-- About Screen -->
     <string name="about">Acerca de</string>
-    <string name="about_screen">Pantalla de información</string>
-    <string name="about_description">Más información sobre GoPlanifi y sus características.</string>
+    <string name="about_screen">Pantalla Acerca de</string>
+    <string name="about_description">Aprende más sobre GoPlanifi y sus funciones.</string>
     <string name="about_details">GoPlanifi te ayuda a organizar y gestionar tus viajes fácilmente.</string>
     <string name="about_contact">Contacto: support@goplanifi.com</string>
 
     <!-- List Example -->
-    <string name="add_item">Agregar ítem</string>
+    <string name="add_item">Agregar artículo</string>
     <string name="add_shopping_item">Agregar artículo de compra</string>
     <string name="add">Agregar</string>
     <string name="cancel">Cancelar</string>
@@ -60,19 +60,71 @@
     <!-- Terms and Conditions -->
     <string name="terms_screen">Términos y Condiciones</string>
     <string name="terms_title">Términos y Condiciones</string>
-    <string name="terms_intro">Por favor, lea estos términos cuidadosamente antes de usar la aplicación.</string>
-    <string name="terms_usage">Política de Uso</string>
-    <string name="terms_usage_text">Al usar esta aplicación, usted acepta cumplir con todas las reglas y regulaciones.</string>
-    <string name="terms_privacy">Política de Privacidad</string>
-    <string name="terms_privacy_text">Estamos comprometidos a proteger sus datos y privacidad.</string>
-    <string name="terms_contact">Información de Contacto</string>
-    <string name="terms_contact_text">Para cualquier consulta, comuníquese con support@goplanifi.com.</string>
+    <string name="terms_intro">Por favor, lee estos términos antes de usar la aplicación.</string>
+    <string name="terms_usage">Política de uso</string>
+    <string name="terms_usage_text">Al usar esta aplicación, aceptas cumplir con todas las reglas.</string>
+    <string name="terms_privacy">Política de privacidad</string>
+    <string name="terms_privacy_text">Estamos comprometidos con proteger tus datos y tu privacidad.</string>
+    <string name="terms_contact">Información de contacto</string>
+    <string name="terms_contact_text">Si tienes preguntas, escríbenos a support@goplanifi.com.</string>
 
     <!-- Misc -->
-    <string name="back_icon">Icono de retroceso</string>
+    <string name="back_icon">Icono de regresar</string>
     <string name="add_trip">Agregar un nuevo viaje</string>
     <string name="trip_name">Nombre del viaje</string>
+    <string name="Trips">Viajes</string>
     <string name="trip_destination">Destino</string>
     <string name="default_user">Usuario predeterminado</string>
     <string name="default_pass">Contraseña predeterminada</string>
+    <string name="no_trips_found">No se encontraron viajes</string>
+    <string name="trip_start_date">Fecha de inicio</string>
+    <string name="trip_end_date">Fecha de fin</string>
+    <string name="view_itinerary">Ver itinerario</string>
+    <string name="myTrips">Mis viajes</string>
+
+    <!-- Destinations & Activities -->
+    <string name="paris_eiffel">Explora la Torre Eiffel</string>
+    <string name="paris_versailles">Excursión de un día a Versalles</string>
+    <string name="paris_champs">Pasea por los Campos Elíseos y visita el Arco de Triunfo</string>
+    <string name="paris_seine">Crucero por el Sena y visita a Notre-Dame</string>
+
+    <string name="tokyo_temples">Visita el Templo Senso-ji y el Santuario Meiji</string>
+    <string name="tokyo_akihabara">Explora Akihabara: anime y tecnología</string>
+    <string name="tokyo_odaiba">Descubre Odaiba y teamLab Borderless</string>
+    <string name="tokyo_shibuya">Cruce de Shibuya y Jardín Nacional Shinjuku Gyoen</string>
+
+    <string name="nyc_main">Visita Times Square, Central Park y Broadway</string>
+    <string name="nyc_museums">Tour de museos (Met, MoMA)</string>
+    <string name="nyc_liberty">Ferry a la Estatua de la Libertad</string>
+    <string name="nyc_highline">Camina por el High Line y visita Chelsea Market</string>
+    <string name="nyc_brooklyn">Puente de Brooklyn y zona DUMBO</string>
+
+    <string name="rome_colosseum">Explora el Coliseo y el Foro Romano</string>
+    <string name="rome_vatican">Museos Vaticanos y la Basílica de San Pedro</string>
+    <string name="rome_trastevere">Pasea por Trastevere y visita Santa Maria</string>
+    <string name="rome_pantheon">Visita el Panteón y la Plaza Navona</string>
+
+    <string name="sydney_bondi">Surf en Bondi Beach y caminata costera</string>
+    <string name="sydney_opera">Ópera de Sídney y el Puente del Puerto</string>
+    <string name="sydney_garden">Jardín Botánico y Circular Quay</string>
+    <string name="sydney_manly">Explora Manly Beach y regresa en ferry</string>
+
+    <!-- Dynamic UI Text -->
+    <string name="trip_to">✈️ Viaje a %1$s</string>
+    <string name="trip_id_label">🆔 ID del viaje: %1$s</string>
+    <string name="choose_itinerary_items">📍 Elige tus elementos del itinerario:</string>
+    <string name="all_itineraries">Itinerarios</string>
+    <string name="no_itineraries">No hay itinerarios seleccionados.</string>
+    <string name="location_label">📍 Ubicación: %1$s</string>
+    <string name="date_label">📅 Fecha: %1$s</string>
+    <string name="select_date_for_itinerary">📅 Selecciona una fecha para este itinerario</string>
+    <string name="trip_start_date_label">🛫 Fecha de inicio</string>
+    <string name="trip_end_date_label">🛬 Fecha de fin</string>
+    <string name="no_user_logged_in">Ningún usuario ha iniciado sesión.</string>
+    <string name="edit_trip_title">Editar fechas del viaje e itinerarios</string>
+    <string name="itinerary_label">📋 Itinerarios:</string>
+    <string name="destination">Destino</string>
+    <string name="edit_dates">Editar fechas</string>
+    <string name="delete">Eliminar</string>
+    <string name="select_date">Seleccionar fecha</string>
 </resources>

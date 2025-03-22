@@ -1,16 +1,18 @@
 package com.example.goplanify
 
+import ItineraryScreen
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.goplanify.ui.screens.AboutScreen
 import com.example.goplanify.ui.screens.ProfileScreen
 import com.example.goplanify.ui.screens.SettingsScreen
 import com.example.goplanify.ui.screens.VersionScreen
 import com.example.goplanify.ui.screens.TermsAndConditionsScreen
-import com.example.goplanify.ui.screens.ItineraryScreen
 import com.example.goplanify.ui.screens.TripsScreen
 import com.example.goplanify.ui.screens.MainScreen
 import com.example.goplanify.ui.screens.LoginScreen
@@ -24,12 +26,11 @@ fun NavGraph(navController: NavHostController) {
     val profileRoute = "Profile" // "Profile"
     val settingsRoute = "Settings" // "Settings"
     val termsRoute = "Terms" // "Terms & Conditions"
-    val itineraryRoute = "itineraryScreen/{tripId}" // Using tripId as parameter
+    val itineraryRoute = "ItineraryScreen?tripId={tripId}" // <- Ruta con parámetro opcional
     val tripsRoute = "tripsScreen" // Trips screen route
     val loginRoute = "loginScreen" // Trips screen route
 
     // Crea el tripViewModel aquí para ser accesible en todas las pantallas
-
     val tripViewModel: TripViewModel = viewModel()
     tripViewModel.fetchTrips()
 
@@ -46,12 +47,17 @@ fun NavGraph(navController: NavHostController) {
         composable(loginRoute) { LoginScreen(navController) }
 
         // Itinerary screen with tripId as a parameter, pass tripViewModel
-        composable(itineraryRoute) { backStackEntry ->
+        composable(
+            route = "ItineraryScreen?tripId={tripId}",
+            arguments = listOf(navArgument("tripId") {
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
             val tripId = backStackEntry.arguments?.getString("tripId")
-            if (tripId != null) {
-                ItineraryScreen(navController, tripId, tripViewModel) // Pasa el tripViewModel
-            }
+            ItineraryScreen(navController = navController, tripId = tripId)
         }
+
         // Trips screen
         composable(tripsRoute) { TripsScreen(navController) }
     }

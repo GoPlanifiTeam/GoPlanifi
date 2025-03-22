@@ -2,6 +2,7 @@ package com.example.goplanify.domain.repository
 
 import com.example.goplanify.domain.model.Preferences
 import com.example.goplanify.domain.model.User
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,4 +25,10 @@ class PreferencesRepository @Inject constructor() {
     fun toggleNotifications(user: User, isEnabled: Boolean) {
         userPreferences[user.userId]?.notificationsEnabled = isEnabled
     }
+
+    // Nuevo método para obtener el idioma preferido
+    fun getPreferredLanguage(user: User): String {
+        return userPreferences[user.userId]?.preferredLanguage ?: "en"
+    }
+
 }

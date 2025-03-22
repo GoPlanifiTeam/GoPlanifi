@@ -1,4 +1,4 @@
-package com.example.goplanify.ui.screens
+package com.example.goplanify.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.example.goplanify.domain.model.User
@@ -7,8 +7,21 @@ import kotlinx.coroutines.flow.StateFlow
 
 class AuthViewModel : ViewModel() {
 
-    private val _currentUser = MutableStateFlow<User?>(null)
+    private val _currentUser = MutableStateFlow<User?>(User(
+        userId = "testUser123",
+        email = "test@test.com",
+        password = "defaultPass",
+        firstName = "Test",
+        lastName = "User",
+        trips = null,
+        imageURL = "https://example.com/user-avatar.png"
+    ))
     val currentUser: StateFlow<User?> = _currentUser
+
+    // Function to get the current user
+    fun getCurrentUser(): User? {
+        return _currentUser.value
+    }
 
     private val _testUser = MutableStateFlow<User?>(null)
     val testUser: StateFlow<User?> = _testUser
@@ -30,9 +43,5 @@ class AuthViewModel : ViewModel() {
             return true
         }
         return false
-    }
-
-    fun logout() {
-        _currentUser.value = null
     }
 }

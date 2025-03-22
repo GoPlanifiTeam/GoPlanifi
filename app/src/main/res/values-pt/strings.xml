@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">GoPlanifi</string>
-    <string name="trip">Viagem</string>
-    <string name="itinerary">Itinerário</string>
+    <string name="trip">Explore nossos pacotes de viagem prontos!</string>
+    <string name="itinerary">Roteiro</string>
     <string name="userPreference">Preferências do usuário</string>
     <string name="welcome">Bem-vindo ao</string>
     <string name="fab">FAB</string>
@@ -16,24 +16,24 @@
     <string name="profile">Perfil</string>
     <string name="profile_screen">Tela de perfil</string>
     <string name="profile_name">Nome:</string>
-    <string name="profile_email">E-mail:</string>
+    <string name="profile_email">Email:</string>
     <string name="profile_location">Localização:</string>
     <string name="profile_info">Informações adicionais do perfil, configurações, foto, etc.</string>
 
     <!-- Settings Screen -->
     <string name="settings">Configurações</string>
     <string name="settings_screen">Tela de configurações</string>
-    <string name="settings_notifications">Configurações de notificações</string>
+    <string name="settings_notifications">Configurações de notificação</string>
     <string name="settings_language">Configurações de idioma</string>
     <string name="settings_theme">Tema claro ou escuro</string>
-    <string name="settings_advanced">Configurações avançadas…</string>
+    <string name="settings_advanced">Mais configurações avançadas…</string>
 
     <!-- Version Screen -->
     <string name="version">Versão</string>
     <string name="version_screen">Tela de versão</string>
-    <string name="version_app_name">Aplicação: GoPlanifi</string>
+    <string name="version_app_name">Aplicativo: GoPlanifi</string>
     <string name="version_current">Versão atual: 1.0.0</string>
-    <string name="version_release_date">Data de lançamento: Fevereiro de 2025</string>
+    <string name="version_release_date">Data de lançamento: fevereiro de 2025</string>
     <string name="version_changelog">Registro de alterações:</string>
     <string name="version_changelog_login">- Tela de login adicionada</string>
     <string name="version_changelog_performance">- Melhorias de desempenho</string>
@@ -47,7 +47,7 @@
 
     <!-- List Example -->
     <string name="add_item">Adicionar item</string>
-    <string name="add_shopping_item">Adicionar item de compra</string>
+    <string name="add_shopping_item">Adicionar item de compras</string>
     <string name="add">Adicionar</string>
     <string name="cancel">Cancelar</string>
     <string name="quantity">Quantidade:</string>
@@ -61,18 +61,69 @@
     <string name="terms_screen">Termos e Condições</string>
     <string name="terms_title">Termos e Condições</string>
     <string name="terms_intro">Leia atentamente estes termos antes de usar o aplicativo.</string>
-    <string name="terms_usage">Política de Uso</string>
-    <string name="terms_usage_text">Ao usar este aplicativo, você concorda em cumprir todas as regras e regulamentos.</string>
-    <string name="terms_privacy">Política de Privacidade</string>
-    <string name="terms_privacy_text">Estamos comprometidos em proteger seus dados e privacidade.</string>
-    <string name="terms_contact">Informações de Contato</string>
-    <string name="terms_contact_text">Para qualquer dúvida, entre em contato pelo e-mail support@goplanifi.com.</string>
+    <string name="terms_usage">Política de uso</string>
+    <string name="terms_usage_text">Ao usar este aplicativo, você concorda em seguir todas as regras.</string>
+    <string name="terms_privacy">Política de privacidade</string>
+    <string name="terms_privacy_text">Estamos comprometidos com a proteção dos seus dados e da sua privacidade.</string>
+    <string name="terms_contact">Informações de contato</string>
+    <string name="terms_contact_text">Se tiver dúvidas, entre em contato com support@goplanifi.com.</string>
 
     <!-- Misc -->
     <string name="back_icon">Ícone de voltar</string>
-    <string name="add_trip">Adicionar uma nova viagem</string>
+    <string name="add_trip">Adicionar nova viagem</string>
     <string name="trip_name">Nome da viagem</string>
     <string name="trip_destination">Destino</string>
     <string name="default_user">Usuário padrão</string>
     <string name="default_pass">Senha padrão</string>
+    <string name="no_trips_found">Nenhuma viagem encontrada</string>
+    <string name="trip_start_date">Data de início</string>
+    <string name="trip_end_date">Data de término</string>
+    <string name="view_itinerary">Ver roteiro</string>
+    <string name="myTrips">Minhas viagens</string>
+    <string name="Trips">Viagens</string>
+    <!-- Destinations & Activities -->
+    <string name="paris_eiffel">Explorar a Torre Eiffel</string>
+    <string name="paris_versailles">Excursão a Versalhes</string>
+    <string name="paris_champs">Passeio pelos Champs-Élysées e Arco do Triunfo</string>
+    <string name="paris_seine">Cruzeiro pelo Sena e visita à Notre-Dame</string>
+
+    <string name="tokyo_temples">Visite o Templo Sensō-ji e o Santuário Meiji</string>
+    <string name="tokyo_akihabara">Explore Akihabara: anime e tecnologia</string>
+    <string name="tokyo_odaiba">Descubra Odaiba e teamLab Borderless</string>
+    <string name="tokyo_shibuya">Cruze Shibuya e visite o jardim Shinjuku Gyoen</string>
+
+    <string name="nyc_main">Visite Times Square, Central Park e Broadway</string>
+    <string name="nyc_museums">Passeio pelos museus (Met, MoMA)</string>
+    <string name="nyc_liberty">Balsa para a Estátua da Liberdade</string>
+    <string name="nyc_highline">Caminhe pela High Line e visite o Chelsea Market</string>
+    <string name="nyc_brooklyn">Ponte do Brooklyn e bairro DUMBO</string>
+
+    <string name="rome_colosseum">Explore o Coliseu e o Fórum Romano</string>
+    <string name="rome_vatican">Museus do Vaticano e Basílica de São Pedro</string>
+    <string name="rome_trastevere">Passeio por Trastevere e visita a Santa Maria</string>
+    <string name="rome_pantheon">Visite o Panteão e a Praça Navona</string>
+
+    <string name="sydney_bondi">Surfe em Bondi Beach e caminhada costeira</string>
+    <string name="sydney_opera">Ópera de Sydney e ponte do porto</string>
+    <string name="sydney_garden">Jardim Botânico e Circular Quay</string>
+    <string name="sydney_manly">Explore Manly Beach e volte de balsa</string>
+
+    <!-- Dynamic UI Text -->
+    <string name="trip_to">✈️ Viagem para %1$s</string>
+    <string name="trip_id_label">🆔 ID da viagem: %1$s</string>
+    <string name="choose_itinerary_items">📍 Escolha os itens do seu roteiro:</string>
+    <string name="all_itineraries">Roteiros</string>
+    <string name="no_itineraries">Nenhum roteiro selecionado.</string>
+    <string name="location_label">📍 Local: %1$s</string>
+    <string name="date_label">📅 Data: %1$s</string>
+    <string name="select_date_for_itinerary">📅 Selecione a data para este roteiro</string>
+    <string name="trip_start_date_label">🛫 Data de início</string>
+    <string name="trip_end_date_label">🛬 Data de término</string>
+    <string name="no_user_logged_in">Nenhum usuário conectado.</string>
+    <string name="edit_trip_title">Editar datas da viagem e dos roteiros</string>
+    <string name="itinerary_label">📋 Roteiros:</string>
+    <string name="destination">Destino</string>
+    <string name="edit_dates">Editar datas</string>
+    <string name="delete">Excluir</string>
+    <string name="select_date">Selecionar data</string>
 </resources>

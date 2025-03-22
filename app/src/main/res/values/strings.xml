@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">GoPlanifi</string>
-    <string name="trip">Trip</string>
+    <string name="trip">Explore our ready-to-go trips!</string>
     <string name="itinerary">Itinerary</string>
     <string name="userPreference">User Preferences</string>
     <string name="welcome">Welcome to</string>
@@ -70,9 +70,68 @@
 
     <!-- Misc -->
     <string name="back_icon">Back Icon</string>
+    <string name="Trips">Trips</string>
     <string name="add_trip">Add a New Trip</string>
     <string name="trip_name">Trip Name</string>
     <string name="trip_destination">Destination</string>
     <string name="default_user">Default User</string>
     <string name="default_pass">Default Password</string>
+    <string name="no_trips_found">No trips found</string>
+    <string name="view_itinerary">ver itinerario</string>
+    <string name="myTrips">My Trips</string>
+
+    <!-- Paris -->
+    <string name="paris_eiffel">Explore the Eiffel Tower</string>
+    <string name="paris_versailles">Day trip to Versailles</string>
+    <string name="paris_champs">Walk along the Champs-Élysées and visit the Arc de Triomphe</string>
+    <string name="paris_seine">Enjoy a Seine river cruise and visit Notre-Dame Cathedral</string>
+
+    <!-- Tokyo -->
+    <string name="tokyo_temples">Visit the Senso-ji Temple and Meiji Shrine</string>
+    <string name="tokyo_akihabara">Explore Akihabara for anime and technology</string>
+    <string name="tokyo_odaiba">Discover Odaiba, teamLab Borderless and shopping malls</string>
+    <string name="tokyo_shibuya">Visit Shibuya Crossing and explore Shinjuku Gyoen National Garden</string>
+
+    <!-- NYC -->
+    <string name="nyc_main">Visit Times Square, Central Park, and Broadway</string>
+    <string name="nyc_museums">Museum tour (Metropolitan Museum of Art, MoMA)</string>
+    <string name="nyc_liberty">Take the ferry to Liberty Island and visit the Statue of Liberty</string>
+    <string name="nyc_highline">Walk the High Line and explore Chelsea Market</string>
+    <string name="nyc_brooklyn">Explore the Brooklyn Bridge and DUMBO area</string>
+
+    <!-- Rome -->
+    <string name="rome_colosseum">Explore the Colosseum and Roman Forum</string>
+    <string name="rome_vatican">Vatican Museums and St. Peter\'s Basilica</string>
+    <string name="rome_trastevere">Wander through Trastevere and visit Santa Maria in Trastevere</string>
+    <string name="rome_pantheon">Visit the Pantheon and Piazza Navona</string>
+
+    <!-- Sydney -->
+    <string name="sydney_bondi">Bondi Beach surfing and coastal walk</string>
+    <string name="sydney_opera">Sydney Opera House and Harbour Bridge</string>
+    <string name="sydney_garden">Royal Botanic Garden and Circular Quay walk</string>
+    <string name="sydney_manly">Explore Manly Beach and take the ferry back</string>
+
+    <string name="trip_to">✈️ Trip to %1$s</string>
+    <string name="trip_id_label">🆔 Trip ID: %1$s</string>
+    <string name="choose_itinerary_items">📍 Choose your itinerary items:</string>
+    <string name="all_itineraries">Itineraries</string>
+    <string name="no_itineraries">No itineraries selected.</string>
+    <string name="location_label">📍 Location: %1$s</string>
+    <string name="date_label">📅 Date: %1$s</string>
+    <string name="select_date_for_itinerary">📅 Select date for this itinerary</string>
+    <string name="trip_start_date">🛫 Start Date</string>
+    <string name="trip_end_date">🛬 End Date</string>
+
+    <string name="no_user_logged_in">No user is logged in.</string>
+    <string name="edit_trip_title">Edit Trip and Itinerary Dates</string>
+    <string name="trip_start_date_label">🛫 Trip Start Date</string>
+    <string name="trip_end_date_label">🛬 Trip End Date</string>
+    <string name="itinerary_label">📋 Itineraries:</string>
+    <string name="destination">Destination</string>
+    <string name="edit_dates">Edit Dates</string>
+    <string name="delete">Delete</string>
+    <string name="select_date">Select Date</string>
+
+
+
 </resources>
