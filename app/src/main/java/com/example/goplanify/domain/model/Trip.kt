@@ -1,5 +1,7 @@
 package com.example.goplanify.domain.model
 
+import java.util.Date
+
 data class Trip(
     val map: Map?,
     val id: String,
