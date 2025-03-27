@@ -33,3 +33,5 @@ replay_pid*
 /.gradle
 .gradle
 .idea
+.idea/caches/deviceStreaming.xml
+/.gradle
