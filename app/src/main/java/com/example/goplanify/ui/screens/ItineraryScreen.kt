@@ -1,7 +1,9 @@
-package com.example.goplanify.ui.screens
-
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,134 +16,278 @@ import androidx.navigation.NavController
 import com.example.goplanify.ui.viewmodel.ItineraryViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
 import com.example.goplanify.R
-import java.util.Calendar
+import com.example.goplanify.domain.model.ItineraryItem
+import com.example.goplanify.domain.model.Trip
+import com.example.goplanify.ui.screens.BottomBar
+import com.example.goplanify.ui.screens.CommonTopBar
+import com.example.goplanify.ui.viewmodel.AuthViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun ItineraryScreen(
-    navController: NavController, 
-    tripId: String, 
+    navController: NavController,
+    tripId: String? = null,
     tripViewModel: TripViewModel = hiltViewModel(),
-    itineraryViewModel: ItineraryViewModel = hiltViewModel()
+    itineraryViewModel: ItineraryViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    // Get the trip and itineraries
-    val trip = tripViewModel.trips.collectAsState().value.find { it.id == tripId }
-    val itineraries = trip?.itineraries ?: emptyList()
+    val currentUser by authViewModel.currentUser.collectAsState()
 
-    // Observe the selected itineraries from the view model
+    LaunchedEffect(currentUser) {
+        currentUser?.let { tripViewModel.getObjectUserTrips(it) }
+    }
+
+    val trips by tripViewModel.userTrips.collectAsState()
+    val allTrips by tripViewModel.trips.collectAsState()
     val selectedItineraries by itineraryViewModel.selectedItineraries.collectAsState()
+    val trip = allTrips.find { it.id == tripId }
 
-    // Variables for the dates
-    var itineraryStartDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
-    var itineraryEndDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    val itineraries = when {
+        tripId != null && trip != null -> trip.itineraries
+        tripId == null && currentUser != null ->
+            trips.filter { it.user?.userId == currentUser!!.userId }.flatMap { it.itineraries }
+        else -> emptyList()
+    }
+
+    var itineraryDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var tripStartDate by remember { mutableStateOf(trip?.startDate ?: "") }
     var tripEndDate by remember { mutableStateOf(trip?.endDate ?: "") }
-
+    var itineraryDatesValid by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+    var isTripStartDateValid by remember { mutableStateOf(true) }
+    var isTripEndDateValid by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+    fun stringToDate(dateString: String?): Date? = try { dateFormat.parse(dateString ?: "") } catch (_: Exception) { null }
+    fun isDateInFuture(date: String): Boolean = stringToDate(date)?.after(Calendar.getInstance().time) == true
+    fun isDateInTripRange(date: String, startDate: String, endDate: String): Boolean {
+        val dateParsed = stringToDate(date)
+        val start = stringToDate(startDate)
+        val end = stringToDate(endDate)
+        return if (dateParsed != null && start != null && end != null) {
+            !dateParsed.before(start) && !dateParsed.after(end)
+        } else {
+            false
+        }
+    }
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.itinerary), navController) },
         bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
+            contentPadding = paddingValues,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Display trip information
-            Text(text = stringResource(R.string.trip_name, tripId), modifier = Modifier.padding(bottom = 16.dp))
-            Text(text = stringResource(R.string.trip_destination, trip?.destination ?: ""), modifier = Modifier.padding(bottom = 16.dp))
-
-            itineraries.forEach { itinerary ->
-                var isChecked by remember { mutableStateOf(selectedItineraries.contains(itinerary)) }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    Checkbox(
-                        checked = isChecked,
-                        onCheckedChange = {
-                            isChecked = it
-                            itineraryViewModel.toggleItinerarySelection(itinerary)  // Toggle selection in the ViewModel
+            item {
+                if (tripId != null) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            trip?.let {
+                                Text(text = "✈️ Trip to ${it.destination}", style = MaterialTheme.typography.titleLarge)
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = "🆔 Trip ID: $tripId", style = MaterialTheme.typography.bodySmall)
                         }
+                    }
+                    Text(
+                        text = "📍 Choose your itinerary items:",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    Text(text = itinerary.name)
-                }
-
-                if (isChecked) {
-                    // Show date pickers for selected itineraries
-                    DatePicker(
-                        currentDate = itineraryStartDates[itinerary.id] ?: "",
-                        onDateSelected = { date ->
-                            itineraryStartDates = itineraryStartDates + (itinerary.id to date)
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    DatePicker(
-                        currentDate = itineraryEndDates[itinerary.id] ?: "",
-                        onDateSelected = { date ->
-                            itineraryEndDates = itineraryEndDates + (itinerary.id to date)
-                        }
-                    )
+                } else {
+                    Text(text = "Itineraries", modifier = Modifier.padding(bottom = 16.dp))
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if (tripId == null) {
+                if (itineraries.isEmpty()) {
 
-            // Show date pickers for the main trip
-            Text(text = stringResource(R.string.trip))
-            DatePicker(
-                currentDate = tripStartDate,
-                onDateSelected = { selectedDate -> tripStartDate = selectedDate }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            DatePicker(
-                currentDate = tripEndDate,
-                onDateSelected = { selectedDate -> tripEndDate = selectedDate }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    // Validate dates and update itineraries
-                    var isValid = true
-
-                    if (tripStartDate >= trip?.startDate.toString() && tripEndDate <= trip?.endDate.toString()) {
-                        selectedItineraries.forEach { itinerary ->
-                            val startDate = itineraryStartDates[itinerary.id] ?: ""
-                            val endDate = itineraryEndDates[itinerary.id] ?: ""
-
-                            if (trip != null) {
-                                if (startDate >= trip.startDate && endDate <= trip.endDate) {
-                                    itineraryViewModel.updateItineraryDates(itinerary.id, startDate, endDate)
-                                } else {
-                                    isValid = false
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = stringResource(R.string.no_trips_found), style = MaterialTheme.typography.bodyLarge)
+                        }
+                    }
+                } else {
+                    val itinerariesByTrip = trips.filter { it.itineraries.isNotEmpty() }.associateWith { it.itineraries }
+                    itinerariesByTrip.forEach { (trip, tripItineraries) ->
+                        items(tripItineraries) { itinerary ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text("🏷️ ${itinerary.name}", style = MaterialTheme.typography.titleSmall)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text("📍 Location: ${itinerary.location}", style = MaterialTheme.typography.bodyMedium)
+                                    Text("📅 Date: ${itinerary.startDate}", style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
-                    } else {
-                        isValid = false
                     }
+                    item { Spacer(modifier = Modifier.height(16.dp)) }
+                    return@LazyColumn
+                }
+            }
 
-                    if (isValid) {
-                        navController.navigate("tripsScreen")
+            items(itineraries) { itinerary ->
+                var isChecked by remember { mutableStateOf(selectedItineraries.contains(itinerary)) }
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = {
+                                    isChecked = it
+                                    itineraryViewModel.toggleItinerarySelection(itinerary)
+                                }
+                            )
+                            Text(itinerary.name, style = MaterialTheme.typography.titleSmall)
+                        }
+
+                        if (isChecked) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("📅 Select date for this itinerary", style = MaterialTheme.typography.bodyMedium)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            DatePicker(
+                                currentDate = itineraryDates[itinerary.id] ?: "",
+                                onDateSelected = { date ->
+                                    if (isDateInFuture(date)) {
+                                        itineraryDates = itineraryDates + (itinerary.id to date)
+                                        itineraryDatesValid = itineraryDatesValid + (itinerary.id to true)
+                                    } else {
+                                        itineraryDatesValid = itineraryDatesValid + (itinerary.id to false)
+                                    }
+                                },
+                                tripStartDate = tripStartDate,
+                                tripEndDate = tripEndDate
+                            )
+                        }
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(R.string.save))
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("🛫 Start Date", style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        DatePicker(
+                            currentDate = tripStartDate,
+                            onDateSelected = {
+                                tripStartDate = it
+                                isTripStartDateValid = isDateInFuture(it)
+                            },
+                            tripStartDate = tripStartDate,
+                            tripEndDate = tripEndDate
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("🛬 End Date", style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        DatePicker(
+                            currentDate = tripEndDate,
+                            onDateSelected = {
+                                tripEndDate = it
+                                isTripEndDateValid = isDateInFuture(it)
+                            },
+                            tripStartDate = tripStartDate,
+                            tripEndDate = tripEndDate
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = {
+                        var isValid = true
+                        val tripStart = stringToDate(tripStartDate)
+                        val tripEnd = stringToDate(tripEndDate)
+
+                        if (tripStart != null && tripEnd != null && tripStart <= tripEnd && isTripStartDateValid && isTripEndDateValid) {
+                            selectedItineraries.forEach { itinerary ->
+                                val date = itineraryDates[itinerary.id] ?: ""
+                                val isValidDate = itineraryDatesValid[itinerary.id] == true &&
+                                        isDateInFuture(date) &&
+                                        isDateInTripRange(date, tripStartDate, tripEndDate)
+
+                                if (isValidDate) {
+                                    itineraryViewModel.updateItineraryDates(itinerary.id, date, date)
+                                } else {
+                                    isValid = false
+                                    Log.e("ItineraryScreen", "Itinerary ${itinerary.name} has an invalid date.")
+                                }
+                            }
+                        }
+
+
+                        if (isValid) {
+                            val newTrip = Trip(
+                                map = null,
+                                id = UUID.randomUUID().toString(),
+                                destination = trip?.destination ?: "User Trip",
+                                user = currentUser,
+                                startDate = tripStartDate,
+                                endDate = tripEndDate,
+                                itineraries = selectedItineraries.map { itinerary ->
+                                    ItineraryItem(
+                                        id = UUID.randomUUID().toString(),
+                                        name = itinerary.name,
+                                        location = itinerary.location,
+                                        startDate = itineraryDates[itinerary.id] ?: "",
+                                        endDate = itineraryDates[itinerary.id] ?: "",
+                                        trip = trip?.id ?: ""
+                                    )
+                                },
+                                images = null,
+                                aiRecommendations = null
+                            )
+                            tripViewModel.addTrip(newTrip,context)
+                            navController.navigate("tripsScreen")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                ) {
+                    Text(text = stringResource(R.string.save))
+                }
             }
         }
     }
+
+
+
 }
+
+
+
 
 @Composable
 fun DatePicker(
     onDateSelected: (String) -> Unit,
-    currentDate: String
+    currentDate: String,
+    tripStartDate: String,
+    tripEndDate: String
 ) {
     val context = LocalContext.current
     val datePickerDialog = remember { mutableStateOf<DatePickerDialog?>(null) }
@@ -152,14 +298,13 @@ fun DatePicker(
     val month = calendar.get(Calendar.MONTH)
     val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
 
-    // Create a DatePickerDialog when the date is selected
     LaunchedEffect(Unit) {
         datePickerDialog.value = DatePickerDialog(
             context,
             { _, selectedYear, selectedMonth, selectedDayOfMonth ->
-                // Format selected date as "YYYY-MM-DD"
-                selectedDate.value = "$selectedYear-${selectedMonth + 1}-$selectedDayOfMonth"
-                onDateSelected(selectedDate.value) // Pass the selected date to the caller
+                val selectedFormattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDayOfMonth)
+                selectedDate.value = selectedFormattedDate
+                onDateSelected(selectedFormattedDate)
             },
             year,
             month,
@@ -167,8 +312,7 @@ fun DatePicker(
         )
     }
 
-    // Show the date picker dialog
     Button(onClick = { datePickerDialog.value?.show() }) {
-        Text(text = if (selectedDate.value.isEmpty()) stringResource(R.string.add) else selectedDate.value)
+        Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
     }
 }

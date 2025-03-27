@@ -3,11 +3,15 @@ package com.example.goplanify.domain.model
 import java.util.Date
 
 data class Trip(
-    val id: Long = 0,
-    val title: String,
+    val map: Map?,
+    val id: String,
+    val user: User?,
     val destination: String,
-    val startDate: Date,
-    val endDate: Date,
-    val description: String,
-    val imageUrl: String? = null
+    val itineraries: List<ItineraryItem> = emptyList(),
+    val startDate: String,
+    val endDate: String,
+    val images: List<Image>?,
+    val aiRecommendations: List<AIRecommendations>?,
+    val imageURL: String = "https://example.com/default-trip-image.jpg"
 )
+

@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">GoPlanifi</string>
-    <string name="trip">Voyage</string>
+    <string name="trip">Découvrez nos voyages prêts à l\'emploi !</string>
     <string name="itinerary">Itinéraire</string>
     <string name="userPreference">Préférences utilisateur</string>
     <string name="welcome">Bienvenue à</string>
@@ -17,15 +17,15 @@
     <string name="profile_screen">Écran de profil</string>
     <string name="profile_name">Nom :</string>
     <string name="profile_email">E-mail :</string>
-    <string name="profile_location">Localisation :</string>
+    <string name="profile_location">Emplacement :</string>
     <string name="profile_info">Informations supplémentaires du profil, paramètres, photo, etc.</string>
 
     <!-- Settings Screen -->
     <string name="settings">Paramètres</string>
     <string name="settings_screen">Écran des paramètres</string>
-    <string name="settings_notifications">Paramètres des notifications</string>
+    <string name="settings_notifications">Paramètres de notification</string>
     <string name="settings_language">Paramètres de langue</string>
-    <string name="settings_theme">Thème sombre ou clair</string>
+    <string name="settings_theme">Thème clair ou sombre</string>
     <string name="settings_advanced">Paramètres avancés…</string>
 
     <!-- Version Screen -->
@@ -33,21 +33,21 @@
     <string name="version_screen">Écran de version</string>
     <string name="version_app_name">Application : GoPlanifi</string>
     <string name="version_current">Version actuelle : 1.0.0</string>
-    <string name="version_release_date">Date de sortie : Février 2025</string>
+    <string name="version_release_date">Date de sortie : février 2025</string>
     <string name="version_changelog">Journal des modifications :</string>
-    <string name="version_changelog_login">- Ajout de l\'écran de connexion</string>
+    <string name="version_changelog_login">- Écran de connexion ajouté</string>
     <string name="version_changelog_performance">- Améliorations des performances</string>
 
     <!-- About Screen -->
     <string name="about">À propos</string>
-    <string name="about_screen">Écran d\'information</string>
+    <string name="about_screen">Écran À propos</string>
     <string name="about_description">En savoir plus sur GoPlanifi et ses fonctionnalités.</string>
-    <string name="about_details">GoPlanifi vous aide à organiser et gérer vos voyages facilement.</string>
+    <string name="about_details">GoPlanifi vous aide à organiser et gérer facilement vos voyages.</string>
     <string name="about_contact">Contact : support@goplanifi.com</string>
 
     <!-- List Example -->
-    <string name="add_item">Ajouter un élément</string>
-    <string name="add_shopping_item">Ajouter un article de shopping</string>
+    <string name="add_item">Ajouter un article</string>
+    <string name="add_shopping_item">Ajouter un article d\'achat</string>
     <string name="add">Ajouter</string>
     <string name="cancel">Annuler</string>
     <string name="quantity">Quantité :</string>
@@ -58,21 +58,73 @@
     <string name="list">Liste</string>
 
     <!-- Terms and Conditions -->
-    <string name="terms_screen">Conditions Générales</string>
-    <string name="terms_title">Conditions Générales</string>
+    <string name="terms_screen">Conditions générales</string>
+    <string name="Trips">Voyages</string>
+    <string name="terms_title">Conditions générales</string>
     <string name="terms_intro">Veuillez lire attentivement ces conditions avant d\'utiliser l\'application.</string>
     <string name="terms_usage">Politique d\'utilisation</string>
-    <string name="terms_usage_text">En utilisant cette application, vous acceptez de respecter toutes les règles et réglementations.</string>
+    <string name="terms_usage_text">En utilisant cette application, vous acceptez de respecter toutes les règles.</string>
     <string name="terms_privacy">Politique de confidentialité</string>
-    <string name="terms_privacy_text">Nous nous engageons à protéger vos données et votre confidentialité.</string>
+    <string name="terms_privacy_text">Nous nous engageons à protéger vos données et votre vie privée.</string>
     <string name="terms_contact">Informations de contact</string>
-    <string name="terms_contact_text">Pour toute question, contactez-nous à support@goplanifi.com.</string>
+    <string name="terms_contact_text">Pour toute question, contactez support@goplanifi.com.</string>
 
     <!-- Misc -->
-    <string name="back_icon">Icône de retour</string>
+    <string name="back_icon">Icone retour</string>
     <string name="add_trip">Ajouter un nouveau voyage</string>
     <string name="trip_name">Nom du voyage</string>
     <string name="trip_destination">Destination</string>
     <string name="default_user">Utilisateur par défaut</string>
     <string name="default_pass">Mot de passe par défaut</string>
+    <string name="no_trips_found">Aucun voyage trouvé</string>
+    <string name="trip_start_date">Date de début</string>
+    <string name="trip_end_date">Date de fin</string>
+    <string name="view_itinerary">Voir l\'itinéraire</string>
+    <string name="myTrips">Mes voyages</string>
+
+    <!-- Destinations & Activities -->
+    <string name="paris_eiffel">Explorer la Tour Eiffel</string>
+    <string name="paris_versailles">Excursion à Versailles</string>
+    <string name="paris_champs">Promenade sur les Champs-Élysées et visite de l\'Arc de Triomphe</string>
+    <string name="paris_seine">Croisière sur la Seine et visite de Notre-Dame</string>
+
+    <string name="tokyo_temples">Visitez le temple Sensō-ji et le sanctuaire Meiji</string>
+    <string name="tokyo_akihabara">Explorez Akihabara : anime et technologie</string>
+    <string name="tokyo_odaiba">Découvrez Odaiba et teamLab Borderless</string>
+    <string name="tokyo_shibuya">Traversez Shibuya et visitez le jardin Shinjuku Gyoen</string>
+
+    <string name="nyc_main">Visitez Times Square, Central Park et Broadway</string>
+    <string name="nyc_museums">Tour des musées (Met, MoMA)</string>
+    <string name="nyc_liberty">Ferry vers la Statue de la Liberté</string>
+    <string name="nyc_highline">Marchez sur la High Line et visitez Chelsea Market</string>
+    <string name="nyc_brooklyn">Pont de Brooklyn et quartier DUMBO</string>
+
+    <string name="rome_colosseum">Explorez le Colisée et le Forum romain</string>
+    <string name="rome_vatican">Musées du Vatican et basilique Saint-Pierre</string>
+    <string name="rome_trastevere">Promenade à Trastevere et visite de Santa Maria</string>
+    <string name="rome_pantheon">Visitez le Panthéon et la place Navone</string>
+
+    <string name="sydney_bondi">Surf à Bondi Beach et promenade côtière</string>
+    <string name="sydney_opera">Opéra de Sydney et pont du port</string>
+    <string name="sydney_garden">Jardin botanique et Circular Quay</string>
+    <string name="sydney_manly">Explorez Manly Beach et retournez en ferry</string>
+
+    <!-- Dynamic UI Text -->
+    <string name="trip_to">✈️ Voyage à %1$s</string>
+    <string name="trip_id_label">🆔 ID du voyage : %1$s</string>
+    <string name="choose_itinerary_items">📍 Choisissez les éléments de votre itinéraire :</string>
+    <string name="all_itineraries">Itinéraires</string>
+    <string name="no_itineraries">Aucun itinéraire sélectionné.</string>
+    <string name="location_label">📍 Lieu : %1$s</string>
+    <string name="date_label">📅 Date : %1$s</string>
+    <string name="select_date_for_itinerary">📅 Sélectionnez une date pour cet itinéraire</string>
+    <string name="trip_start_date_label">🛫 Date de début</string>
+    <string name="trip_end_date_label">🛬 Date de fin</string>
+    <string name="no_user_logged_in">Aucun utilisateur connecté.</string>
+    <string name="edit_trip_title">Modifier les dates du voyage et des itinéraires</string>
+    <string name="itinerary_label">📋 Itinéraires :</string>
+    <string name="destination">Destination</string>
+    <string name="edit_dates">Modifier les dates</string>
+    <string name="delete">Supprimer</string>
+    <string name="select_date">Sélectionner une date</string>
 </resources>

@@ -38,7 +38,7 @@ class ItineraryViewModel @Inject constructor(
     fun addItineraryItem(tripId: String, activityName: String, location: String, startDate: String, endDate: String) {
         val result = repository.addItineraryItem(tripId, activityName, location, startDate, endDate)
         result.onSuccess { newItem ->
-            _itineraries.value = _itineraries.value + newItem
+            _itineraries.value += newItem
         }
     }
 

@@ -81,7 +81,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("com.google.dagger:hilt-android:2.51.1")
-    
+    implementation("io.coil-kt:coil-compose:2.4.0")
     // Add Hilt navigation and viewmodel support
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
