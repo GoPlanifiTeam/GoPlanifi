@@ -1,17 +1,16 @@
 package com.example.goplanify.ui.viewmodel
 
-import android.content.Context
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.domain.model.User
 import com.example.goplanify.domain.repository.TripRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @HiltViewModel
 class TripViewModel @Inject constructor(
     private val tripRepository: TripRepository
@@ -23,43 +22,57 @@ class TripViewModel @Inject constructor(
     private val _userTrips = MutableStateFlow<List<Trip>>(emptyList())
     val userTrips: StateFlow<List<Trip>> = _userTrips
 
-    fun updateTrip(updatedTrip: Trip) {
-        val result = tripRepository.updateTrip(updatedTrip)
-        if (result.isSuccess) {
-            Log.d("TripViewModel", "Trip updated successfully")
-        } else {
-            Log.e("TripViewModel", "Failed to update trip: ${result.exceptionOrNull()?.message}")
+    init {
+        fetchTrips()
+    }
+
+    fun getObjectUserTrips(user: User) {
+        viewModelScope.launch {
+            val trips = tripRepository.getTripsByUser(user.userId)
+            Log.d("TripViewModel", "Trips fetched  $trips")
+            _userTrips.value = trips
         }
     }
 
-    init {
-           fetchTrips()
+    fun getObjectUserTrips(userId: String) {
+        viewModelScope.launch {
+            val trips = tripRepository.getTripsByUser(userId)
+            Log.d("TripViewModel", "Trips fetched for userId=$userId: $trips")
+            _userTrips.value = trips
+        }
     }
 
     fun fetchTrips() {
-        _trips.value = tripRepository.getTrips()
+        viewModelScope.launch {
+            _trips.value = tripRepository.getTripsByUser("admin") //AAA
+        }
     }
 
-    fun addTrip(trip: Trip, context: Context) {
-        val result = tripRepository.addTrip(trip)
-        Log.d("TripViewModel", "Add trip result: $result")
-        fetchTrips() // Esto es correcto, refresca todos los trips
+    fun fetchUserTrips(userId: String) {
+        viewModelScope.launch {
+            _userTrips.value = tripRepository.getTripsByUser(userId)
+        }
     }
 
-
-    fun getUserTrips(user: User): List<Trip> {
-        val filtered = tripRepository.getTripsByUser(user)
-        _userTrips.value = filtered
-        return filtered
+    fun addTrip(trip: Trip) {
+        viewModelScope.launch {
+            tripRepository.addTrip(trip)
+            fetchTrips()
+        }
     }
 
-
-    fun getObjectUserTrips(user: User){
-        // This should return trips only for the specified user
-        _userTrips.value = tripRepository.getTripsByUser(user)
+    fun updateTrip(trip: Trip) {
+        viewModelScope.launch {
+            tripRepository.updateTrip(trip)
+            fetchTrips()
+        }
     }
 
     fun deleteTrip(tripId: String) {
-        tripRepository.deleteTrip(tripId)
+        viewModelScope.launch {
+            tripRepository.deleteTrip(tripId)
+            fetchTrips()
+        }
     }
 }
+

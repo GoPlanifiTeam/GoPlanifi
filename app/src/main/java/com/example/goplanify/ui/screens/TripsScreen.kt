@@ -1,6 +1,8 @@
+
 package com.example.goplanify.ui.screens
 
 import android.app.DatePickerDialog
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,7 +23,9 @@ import com.example.goplanify.R
 import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.ui.viewmodel.AuthViewModel
 import com.example.goplanify.ui.viewmodel.ItineraryViewModel
+import com.example.goplanify.ui.viewmodel.SettingsViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,20 +33,44 @@ import java.util.*
 fun TripsScreen(
     navController: NavController,
     tripViewModel: TripViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    itineraryViewModel: ItineraryViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val user = authViewModel.getUserById("test123")
+            if (user != null) {
+                authViewModel.setCurrentUser(user)
+                tripViewModel.getObjectUserTrips(user)
+            } else {
+                Log.e("ItineraryScreen", "User not found in the database.")
+            }
+        }
+    }
     val currentUser by authViewModel.currentUser.collectAsState()
+    val trips by tripViewModel.userTrips.collectAsState()
 
     LaunchedEffect(currentUser) {
-        currentUser?.let { tripViewModel.getObjectUserTrips(it) }
+        currentUser?.let { user ->
+            val lang = settingsViewModel.getSavedLanguageFromRoom(user.userId)
+            Log.d("PREFERENCES-LANG", "User ${user.userId} prefers language: $lang")
+        }
     }
 
-    val trips by tripViewModel.userTrips.collectAsState()
 
     if (currentUser == null) {
         Text(text = stringResource(R.string.no_user_logged_in))
         return
     }
+    val context = LocalContext.current
+    val currentLocale = context.resources.configuration.locales[0]
+
+    LaunchedEffect(Unit) {
+        Log.d("LANGUAGE-CHECK", "Current language in TripsScreen: ${currentLocale.language}")
+    }
+
 
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.Trips), navController) },
@@ -78,7 +106,8 @@ fun TripsScreen(
                         TripCard(
                             trip = trip,
                             navController = navController,
-                            tripViewModel = tripViewModel
+                            tripViewModel = tripViewModel,
+                            itineraryViewModel = itineraryViewModel
                         )
                     }
                 }
@@ -91,7 +120,8 @@ fun TripsScreen(
 fun TripCard(
     trip: Trip,
     navController: NavController,
-    tripViewModel: TripViewModel
+    tripViewModel: TripViewModel,
+    itineraryViewModel: ItineraryViewModel
 ) {
     var showDateDialog by remember { mutableStateOf(false) }
     var newStartDate by remember { mutableStateOf(trip.startDate) }
@@ -118,12 +148,18 @@ fun TripCard(
                     }
 
                     if (validStart && validEnd && startDateParsed != null && endDateParsed != null && startDateParsed <= endDateParsed && itinerariesValid) {
+                        updatedItineraries.forEach { itinerary ->
+                            itineraryViewModel.updateItineraryDates(
+                                itinerary.id,
+                                itinerary.startDate,
+                                itinerary.startDate
+                            )
+                        }
+
                         val updatedTrip = trip.copy(
                             startDate = newStartDate,
                             endDate = newEndDate,
-                            itineraries = updatedItineraries.map {
-                                it.copy(endDate = it.startDate)
-                            }
+                            itineraries = updatedItineraries
                         )
 
                         tripViewModel.updateTrip(updatedTrip)

@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import coil.compose.rememberAsyncImagePainter
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import coil.compose.rememberAsyncImagePainter
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,6 +26,7 @@ import com.example.goplanify.domain.model.User
 import com.example.goplanify.ui.viewmodel.AuthViewModel
 import com.example.goplanify.ui.viewmodel.ItineraryViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
@@ -34,14 +35,25 @@ fun MainScreen(
     itineraryViewModel: ItineraryViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val currentUser by authViewModel.currentUser.collectAsState()
-    Log.d("CurrentUser", "Usuario actual $currentUser")
-    val trips by tripViewModel.trips.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        tripViewModel.fetchTrips()
-    }
+        coroutineScope.launch {
+            val admin = authViewModel.getUserById("admin") // You need to expose this method in AuthViewModel
+            if (admin != null) {
+                authViewModel.setCurrentUser(admin)
+                tripViewModel.getObjectUserTrips(admin)
+            } else {
+                Log.e("MainScreen", "Admin user not found in the database.")
+            }
+        }
 
+    }
+    val currentUser by authViewModel.currentUser.collectAsState()
+    val trips by tripViewModel.userTrips.collectAsState()
+
+    Log.d("CurrentUser", "Usuario actual $currentUser")
+    Log.d("Trips","Los Trips $trips")
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.mainApp), navController) },
         bottomBar = { BottomBar(navController) }
@@ -56,18 +68,17 @@ fun MainScreen(
 
             LazyColumn {
                 items(trips) { trip ->
-                    trip.user?.let {
-                        DestinationCard(
-                            destination = trip.destination,
-                            itineraries = trip.itineraries.map { it.name },
-                            navController = navController,
-                            tripViewModel = tripViewModel,
-                            itineraryViewModel = itineraryViewModel,
-                            user = it,
-                            tripId = trip.id,
-                            tripName = trip.destination
-                        )
-                    }
+                    val user = currentUser ?: return@items
+                    DestinationCard(
+                        destination = trip.destination,
+                        itineraries = trip.itineraries.map { it.name },
+                        navController = navController,
+                        tripViewModel = tripViewModel,
+                        itineraryViewModel = itineraryViewModel,
+                        user = user,
+                        tripId = trip.id,
+                        tripName = trip.destination
+                    )
                 }
             }
         }
@@ -111,10 +122,13 @@ fun DestinationCard(
                     contentScale = ContentScale.Crop
                 )
                 Text(text = stringResource(R.string.itinerary), style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    text = "• ${trip.itineraries.first().name}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                if (trip.itineraries.isNotEmpty()) {
+                    Log.d("No esta vacio","$trip.itineraries")
+                    Text(
+                        text = "• ${trip.itineraries.first().name}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
                 Text(
                     text = "🔎 Explore more...",
                     style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary),

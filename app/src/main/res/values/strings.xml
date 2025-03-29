@@ -131,7 +131,8 @@
     <string name="edit_dates">Edit Dates</string>
     <string name="delete">Delete</string>
     <string name="select_date">Select Date</string>
-
+    <string name="select_language">select language</string>
+    <string name="enable_notifications">enable notificacions</string>
 
 
 </resources>

@@ -20,13 +20,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
+import com.example.goplanify.data.local.DatabaseInitializer
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var databaseInitializer: DatabaseInitializer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        databaseInitializer.populateIfEmpty()
         enableEdgeToEdge()
         setContent {
             TestingTheme {

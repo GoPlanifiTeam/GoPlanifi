@@ -3,15 +3,16 @@ package com.example.goplanify.ui.viewmodel
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.goplanify.domain.model.Preferences
-import com.example.goplanify.domain.model.User
 import com.example.goplanify.domain.repository.PreferencesRepository
 import com.example.goplanify.ui.screens.setLocale
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import java.util.Locale
+import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 data class SettingsState(
@@ -21,38 +22,57 @@ data class SettingsState(
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val preferencesRepository: PreferencesRepository) : ViewModel() {
+    private val preferencesRepository: PreferencesRepository
+) : ViewModel() {
+
     private val _settingsState = MutableStateFlow(SettingsState())
     val settingsState: StateFlow<SettingsState> get() = _settingsState
 
-    // Cargar las preferencias del usuario
-    fun loadPreferences(user: User) {
-        preferencesRepository.getPreferences(user)?.let { savedPreferences ->
-            _settingsState.value = SettingsState(
-                notificationsEnabled = savedPreferences.notificationsEnabled,
-                selectedLanguage = savedPreferences.preferredLanguage
-            )
+    fun loadPreferences(userId: String) {
+        viewModelScope.launch {
+            val prefs = preferencesRepository.getPreferences(userId)
+            prefs?.let {
+                _settingsState.value = SettingsState(
+                    notificationsEnabled = it.notificationsEnabled,
+                    selectedLanguage = it.preferredLanguage
+                )
+            }
         }
     }
 
-    fun toggleNotifications(user: User, enabled: Boolean) {
+    fun toggleNotifications(userId: String, enabled: Boolean) {
         _settingsState.update { it.copy(notificationsEnabled = enabled) }
-        preferencesRepository.toggleNotifications(user, enabled)
+        viewModelScope.launch {
+            val current = preferencesRepository.getPreferences(userId)
+            val newPrefs = Preferences(
+                userId = userId,
+                notificationsEnabled = enabled,
+                preferredLanguage = current?.preferredLanguage ?: "es",
+                theme = current?.theme ?: "default"
+            )
+            preferencesRepository.savePreferences(newPrefs)
+        }
     }
 
-    // Cambiar el idioma y guardar la preferencia
-    fun changeLanguage(user: User, language: String, context: Context) {
+
+
+    fun changeLanguage(userId: String, language: String, context: Context) {
         _settingsState.update { it.copy(selectedLanguage = language) }
-        preferencesRepository.savePreferences(user, Preferences(user, _settingsState.value.notificationsEnabled, language, "default"))
-        setLocale(context, language)
-        _settingsState.value = _settingsState.value.copy(selectedLanguage = language)
+        viewModelScope.launch {
+            val current = preferencesRepository.getPreferences(userId)
+            val newPrefs = Preferences(
+                userId = userId,
+                notificationsEnabled = current?.notificationsEnabled ?: true,
+                preferredLanguage = language,
+                theme = current?.theme ?: "default"
+            )
+            preferencesRepository.savePreferences(newPrefs)
+            setLocale(context, language)
+        }
     }
 
-
-    // Método para obtener el idioma desde SharedPreferences si se desea
-    fun getSavedLanguage(context: Context): String {
-        val sharedPreferences: SharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        return sharedPreferences.getString("language", Locale.getDefault().language) ?: "pt"
+    suspend fun getSavedLanguageFromRoom(userId: String): String {
+        val prefs = preferencesRepository.getPreferences(userId)
+        return prefs?.preferredLanguage ?: "en"
     }
-
 }

@@ -1,34 +1,8 @@
 package com.example.goplanify.domain.repository
 
 import com.example.goplanify.domain.model.Preferences
-import com.example.goplanify.domain.model.User
-import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class PreferencesRepository @Inject constructor() {
-    private val userPreferences = mutableMapOf<String, Preferences>()
-
-    fun savePreferences(user: User, preferences: Preferences) {
-        userPreferences[user.userId] = preferences
-    }
-
-    fun getPreferences(user: User): Preferences? {
-        return userPreferences[user.userId]
-    }
-
-    fun updateTheme(user: User, newTheme: String) {
-        userPreferences[user.userId]?.theme = newTheme
-    }
-
-    fun toggleNotifications(user: User, isEnabled: Boolean) {
-        userPreferences[user.userId]?.notificationsEnabled = isEnabled
-    }
-
-    // Nuevo método para obtener el idioma preferido
-    fun getPreferredLanguage(user: User): String {
-        return userPreferences[user.userId]?.preferredLanguage ?: "en"
-    }
-
+interface PreferencesRepository {
+    suspend fun savePreferences(preferences: Preferences)
+    suspend fun getPreferences(userId: String): Preferences?
 }

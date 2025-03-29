@@ -1,47 +1,50 @@
 package com.example.goplanify.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.goplanify.domain.model.User
+import com.example.goplanify.domain.repository.AuthenticationRepository
+import com.example.goplanify.domain.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthViewModel : ViewModel() {
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val authenticationRepository: AuthenticationRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
 
-    private val _currentUser = MutableStateFlow<User?>(User(
-        userId = "testUser123",
-        email = "test@test.com",
-        password = "defaultPass",
-        firstName = "Test",
-        lastName = "User",
-        trips = null,
-        imageURL = "https://example.com/user-avatar.png"
-    ))
+    private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser
 
-    // Function to get the current user
-    fun getCurrentUser(): User? {
-        return _currentUser.value
+    private val _loginErrorCount = MutableStateFlow(0)
+    val loginErrorCount: StateFlow<Int> = _loginErrorCount
+
+    fun getCurrentUser(): User? = _currentUser.value
+
+    fun setCurrentUser(user: User) {
+        _currentUser.value = user
     }
 
-    private val _testUser = MutableStateFlow<User?>(null)
-    val testUser: StateFlow<User?> = _testUser
-
-    var isTestUserInitialized = false
-        private set
-
-    fun initializeTestUser(user: User) {
-        _testUser.value = user
-        isTestUserInitialized = true
+    suspend fun getUserById(userId: String): User? {
+        return userRepository.getUserById(userId)
     }
 
-    fun validateLogin(username: String, password: String): Boolean {
-        val testUser = _testUser.value ?: return false
-
-        // Check if credentials match the test user
-        if (testUser.email == username && testUser.password == password) {
-            _currentUser.value = testUser
-            return true
+    fun validateLogin(email: String, password: String) {
+        viewModelScope.launch {
+            val user = userRepository.getUserByEmail(email)
+            if (user?.password == password) {
+                _currentUser.value = user
+                authenticationRepository.resetLoginError(user.userId)
+                _loginErrorCount.value = 0
+            } else if (user != null) {
+                authenticationRepository.incrementLoginError(user.userId)
+                val current = authenticationRepository.getAuthByUserId(user.userId)
+                _loginErrorCount.value = current?.loginErrors ?: 1
+            }
         }
-        return false
     }
 }

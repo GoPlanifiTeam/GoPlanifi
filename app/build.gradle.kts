@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.Packaging
 
 plugins {
+    id("com.google.devtools.ksp")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -57,7 +58,12 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.core.ktx)
+    implementation(libs.androidx.junit.ktx)
+    val room_version = "2.6.1"
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    testImplementation("androidx.room:room-testing:$room_version") //He puesto esto, por que quizas me sirve para los unitTest
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.core.ktx)
@@ -79,11 +85,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("com.google.dagger:hilt-android:2.51.1")
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation ("com.google.code.gson:gson:2.10.1") //Esto es por que se metmos datos por Json
     // Add Hilt navigation and viewmodel support
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    
+    testImplementation(kotlin("test"))
+
 }

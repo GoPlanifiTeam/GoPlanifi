@@ -21,9 +21,49 @@ import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.ui.screens.BottomBar
 import com.example.goplanify.ui.screens.CommonTopBar
 import com.example.goplanify.ui.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+
+
+
+
+@Composable
+fun DatePicker(
+    onDateSelected: (String) -> Unit,
+    currentDate: String,
+    tripStartDate: String,
+    tripEndDate: String
+) {
+    val context = LocalContext.current
+    val datePickerDialog = remember { mutableStateOf<DatePickerDialog?>(null) }
+    val selectedDate = remember { mutableStateOf(currentDate) }
+
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+
+
+    LaunchedEffect(Unit) {
+        datePickerDialog.value = DatePickerDialog(
+            context,
+            { _, selectedYear, selectedMonth, selectedDayOfMonth ->
+                val selectedFormattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDayOfMonth)
+                selectedDate.value = selectedFormattedDate
+                onDateSelected(selectedFormattedDate)
+            },
+            year,
+            month,
+            dayOfMonth
+        )
+    }
+
+    Button(onClick = { datePickerDialog.value?.show() }) {
+        Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
+    }
+}
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun ItineraryScreen(
@@ -33,22 +73,44 @@ fun ItineraryScreen(
     itineraryViewModel: ItineraryViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val currentUser by authViewModel.currentUser.collectAsState()
-
-    LaunchedEffect(currentUser) {
-        currentUser?.let { tripViewModel.getObjectUserTrips(it) }
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val user = authViewModel.getUserById("test123")
+            if (user != null) {
+                authViewModel.setCurrentUser(user)
+                tripViewModel.getObjectUserTrips(user)
+            } else {
+                Log.e("ItineraryScreen", "User not found in the database.")
+            }
+        }
     }
 
+    val currentUser by authViewModel.currentUser.collectAsState()
     val trips by tripViewModel.userTrips.collectAsState()
     val allTrips by tripViewModel.trips.collectAsState()
     val selectedItineraries by itineraryViewModel.selectedItineraries.collectAsState()
-    val trip = allTrips.find { it.id == tripId }
 
-    val itineraries = when {
-        tripId != null && trip != null -> trip.itineraries
-        tripId == null && currentUser != null ->
-            trips.filter { it.user?.userId == currentUser!!.userId }.flatMap { it.itineraries }
-        else -> emptyList()
+    val trip = allTrips.find { it.id == tripId }
+    Log.d("User Detected","$currentUser")
+    val itineraries: List<ItineraryItem> = when {
+        tripId != null && trip != null -> {
+            Log.d("ItineraryScreen", "Showing itineraries for tripId $tripId: ${trip.itineraries}")
+            trip.itineraries
+        }
+        currentUser != null -> {
+            val userTrips = trips.filter { it.user?.userId == currentUser!!.userId }
+            Log.d("ItineraryScreen", "User ${currentUser!!.userId} has ${userTrips.size} trips")
+            userTrips.flatMap {
+                Log.d("ItineraryScreen", "Trip ${it.id} itineraries: ${it.itineraries}")
+                it.itineraries
+            }
+        }
+        else -> {
+
+            Log.d("ItineraryScreen", "No user or trip found.")
+            emptyList()
+        }
     }
 
     var itineraryDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
@@ -243,9 +305,10 @@ fun ItineraryScreen(
 
 
                         if (isValid) {
+                            val newTripId = UUID.randomUUID().toString()
                             val newTrip = Trip(
                                 map = null,
-                                id = UUID.randomUUID().toString(),
+                                id = newTripId,
                                 destination = trip?.destination ?: "User Trip",
                                 user = currentUser,
                                 startDate = tripStartDate,
@@ -257,13 +320,14 @@ fun ItineraryScreen(
                                         location = itinerary.location,
                                         startDate = itineraryDates[itinerary.id] ?: "",
                                         endDate = itineraryDates[itinerary.id] ?: "",
-                                        trip = trip?.id ?: ""
+                                        trip = newTripId // ✅ correct trip reference
                                     )
                                 },
                                 images = null,
                                 aiRecommendations = null
                             )
-                            tripViewModel.addTrip(newTrip,context)
+
+                            tripViewModel.addTrip(newTrip)
                             navController.navigate("tripsScreen")
                         }
                     },
@@ -277,42 +341,4 @@ fun ItineraryScreen(
 
 
 
-}
-
-
-
-
-@Composable
-fun DatePicker(
-    onDateSelected: (String) -> Unit,
-    currentDate: String,
-    tripStartDate: String,
-    tripEndDate: String
-) {
-    val context = LocalContext.current
-    val datePickerDialog = remember { mutableStateOf<DatePickerDialog?>(null) }
-    val selectedDate = remember { mutableStateOf(currentDate) }
-
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-
-    LaunchedEffect(Unit) {
-        datePickerDialog.value = DatePickerDialog(
-            context,
-            { _, selectedYear, selectedMonth, selectedDayOfMonth ->
-                val selectedFormattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDayOfMonth)
-                selectedDate.value = selectedFormattedDate
-                onDateSelected(selectedFormattedDate)
-            },
-            year,
-            month,
-            dayOfMonth
-        )
-    }
-
-    Button(onClick = { datePickerDialog.value?.show() }) {
-        Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
-    }
 }
