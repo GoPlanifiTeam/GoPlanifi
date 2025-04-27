@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "273772104344",
+    "project_id": "goplanify",
+    "storage_bucket": "goplanify.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "MIRAR ENTREGA CAMPUS",
+        "android_client_info": {
+          "package_name": "com.example.goplanify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "MIRAR ENTREGA CAMPUS"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -7,6 +7,7 @@ import com.example.goplanify.data.local.converters.DateConverter
 import com.example.goplanify.data.local.dao.*
 import com.example.goplanify.data.repository.*
 import com.example.goplanify.domain.repository.*
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -62,11 +63,6 @@ object AppModule {
     @Singleton
     fun provideUserRepository(userDao: UserDao, tripDao: TripDao): UserRepository =
         UserRepositoryImpl(userDao,tripDao)
-
-    @Provides
-    @Singleton
-    fun provideAuthenticationRepository(authDao: AuthenticationDao): AuthenticationRepository =
-        AuthenticationRepositoryImpl(authDao)
 
     @Provides
     @Singleton

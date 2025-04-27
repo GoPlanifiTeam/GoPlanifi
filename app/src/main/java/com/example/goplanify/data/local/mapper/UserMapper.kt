@@ -4,15 +4,21 @@ import com.example.goplanify.data.local.entity.UserEntity
 import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.domain.model.User
 
-    fun User.toEntity(): UserEntity =
-        UserEntity(
-            userId = userId,
-            email = email,
-            password = password,
-            firstName = firstName,
-            lastName = lastName,
-            imageURL = imageURL
-        )
+fun User.toEntity(): UserEntity =
+    UserEntity(
+        userId = userId,
+        email = email,
+        password = password,
+        firstName = firstName,
+        lastName = lastName,
+        username = username,
+        birthDate = birthDate,
+        address = address,
+        country = country,
+        phoneNumber = phoneNumber,
+        acceptEmails = acceptEmails,
+        imageURL = imageURL
+    )
 
 fun UserEntity.toDomain(trips: List<Trip> = emptyList()): User =
     User(
@@ -21,11 +27,12 @@ fun UserEntity.toDomain(trips: List<Trip> = emptyList()): User =
         password = password,
         firstName = firstName,
         lastName = lastName,
+        username = username,
+        birthDate = birthDate,
+        address = address,
+        country = country,
+        phoneNumber = phoneNumber,
+        acceptEmails = acceptEmails,
         imageURL = imageURL,
         trips = trips
     )
-
-
-
-
-

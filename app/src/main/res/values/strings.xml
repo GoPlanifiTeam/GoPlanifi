@@ -122,7 +122,7 @@
     <string name="trip_start_date">🛫 Start Date</string>
     <string name="trip_end_date">🛬 End Date</string>
 
-    <string name="no_user_logged_in">No user is logged in.</string>
+    <string name="no_user_logged_in">Verify your email address</string>
     <string name="edit_trip_title">Edit Trip and Itinerary Dates</string>
     <string name="trip_start_date_label">🛫 Trip Start Date</string>
     <string name="trip_end_date_label">🛬 Trip End Date</string>

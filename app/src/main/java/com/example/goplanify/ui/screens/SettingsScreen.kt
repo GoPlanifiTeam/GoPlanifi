@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -30,23 +31,32 @@ fun SettingsScreen(
     tripViewModel: TripViewModel = hiltViewModel() // Asegúrate de tenerlo disponible
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    // Obtener usuario desde BD y establecer como usuario actual
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val user = authViewModel.getUserById("test123")
-            if (user != null) {
-                authViewModel.setCurrentUser(user)
-                tripViewModel.getObjectUserTrips(user)
-            } else {
-                Log.e("SettingsScreen", "User not found in the database.")
-            }
+    val user by authViewModel.currentUser.collectAsState()
+    val settings by settingsViewModel.settingsState.collectAsState()
+    LaunchedEffect(user) {
+        user?.let { user ->
+            tripViewModel.getObjectUserTrips(user)
+            settingsViewModel.loadPreferences(user.userId)
         }
     }
 
-    val user = authViewModel.currentUser.collectAsState().value
-    val settings by settingsViewModel.settingsState.collectAsState()
+    // If no user is authenticated, show login prompt
+    if (user == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = stringResource(R.string.no_user_logged_in))
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { navController.navigate("loginScreen") }) {
+                    Text(text = "Login")
+                }
+            }
+        }
+        return
+    }
+
 
     Log.d("User Detected", "$user")
 

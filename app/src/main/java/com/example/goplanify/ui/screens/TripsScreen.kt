@@ -37,40 +37,39 @@ fun TripsScreen(
     itineraryViewModel: ItineraryViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val user = authViewModel.getUserById("test123")
-            if (user != null) {
-                authViewModel.setCurrentUser(user)
-                tripViewModel.getObjectUserTrips(user)
-            } else {
-                Log.e("ItineraryScreen", "User not found in the database.")
-            }
-        }
-    }
     val currentUser by authViewModel.currentUser.collectAsState()
     val trips by tripViewModel.userTrips.collectAsState()
 
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
+            tripViewModel.getObjectUserTrips(user)
             val lang = settingsViewModel.getSavedLanguageFromRoom(user.userId)
             Log.d("PREFERENCES-LANG", "User ${user.userId} prefers language: $lang")
         }
     }
 
-
     if (currentUser == null) {
-        Text(text = stringResource(R.string.no_user_logged_in))
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = stringResource(R.string.no_user_logged_in))
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { navController.navigate("loginScreen") }) {
+                    Text(text = "Login")
+                }
+            }
+        }
         return
     }
+
     val context = LocalContext.current
     val currentLocale = context.resources.configuration.locales[0]
 
     LaunchedEffect(Unit) {
         Log.d("LANGUAGE-CHECK", "Current language in TripsScreen: ${currentLocale.language}")
     }
-
 
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.Trips), navController) },

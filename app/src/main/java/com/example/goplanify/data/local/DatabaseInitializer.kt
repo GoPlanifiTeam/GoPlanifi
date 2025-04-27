@@ -26,24 +26,21 @@ class DatabaseInitializer @Inject constructor(
     fun populateIfEmpty() {
         CoroutineScope(Dispatchers.IO).launch {
             if (userDao.getAllUsers().isEmpty() && tripDao.getAllTrips().isEmpty()) {
-                val user = UserEntity(
-                    userId = "test123",
-                    email = "test@example.com", //Default User
-                    password = "password123", //Default password
-                    firstName = "Test",
-                    lastName = "User",
-                    imageURL = null
-                )
                 val admin = UserEntity(
                     userId = "admin",
                     email = "admin@admin.com", //NOT MEANT TO ENTER WITH THIS ONE VITOR!
-                    password = "admin",
+                    password = "adminadmin",
                     firstName = "Admin",
                     lastName = "Admin",
+                    username = "admin",
+                    birthDate = null,
+                    address = null,
+                    country = null,
+                    phoneNumber = null,
+                    acceptEmails = false,
                     imageURL = null
                 )
                 userDao.insertUser(admin)
-                userDao.insertUser(user)
 
                 val trips = listOf(
                     TripEntity(
@@ -96,7 +93,7 @@ class DatabaseInitializer @Inject constructor(
                         )),
                         imagesJson = "[]",
                         recommendationsJson = "[]",
-                        imageURL = "https://media.istockphoto.com/id/931041896/es/foto/skyline-de-manhattan-con-el-edificio-one-world-trade-center-en-el-crepúsculo.jpg"
+                        imageURL = "https://media.tacdn.com/media/attractions-splice-spp-674x446/06/73/10/c0.jpg"
                     ),
                     TripEntity(
                         id = "4",
@@ -113,7 +110,7 @@ class DatabaseInitializer @Inject constructor(
                         )),
                         imagesJson = "[]",
                         recommendationsJson = "[]",
-                        imageURL = "https://media.istockphoto.com/id/1196016334/es/foto/rome-skyline-italia.jpg"
+                        imageURL = "https://www.thetrainline.com/cms/media/1353/italy-rome-colosseum.jpg?mode=crop&width=660&height=440&quality=70"
                     ),
                     TripEntity(
                         id = "5",

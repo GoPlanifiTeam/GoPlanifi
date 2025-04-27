@@ -1,10 +1,12 @@
 import com.android.build.api.dsl.Packaging
+import org.gradle.kotlin.dsl.implementation
 
 plugins {
-    id("com.google.devtools.ksp")
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
+    id("com.google.devtools.ksp")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 }
@@ -58,6 +60,12 @@ android {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation ("com.google.firebase:firebase-appcheck-debug")
+    implementation ("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation ("com.google.firebase:firebase-appcheck")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
     val room_version = "2.6.1"
@@ -86,6 +94,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     ksp("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.8.0")
     implementation("com.google.dagger:hilt-android:2.51.1")
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("com.google.code.gson:gson:2.10.1") //Esto es por que se metmos datos por Json
