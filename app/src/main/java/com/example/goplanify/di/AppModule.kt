@@ -43,6 +43,7 @@ object AppModule {
     @Provides fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
     @Provides fun provideAuthenticationDao(db: AppDatabase): AuthenticationDao = db.authenticationDao()
     @Provides fun providePreferencesDao(db: AppDatabase): PreferencesDao = db.preferencesDao()
+    @Provides fun provideItineraryImageDao(db: AppDatabase): ItineraryImageDao = db.itineraryImageDao() // Nuevo DAO
 
     // Repositories (con interfaz)
     @Provides
@@ -50,19 +51,23 @@ object AppModule {
     fun provideTripRepository(
         tripDao: TripDao,
         userDao: UserDao,
-        itineraryDao: ItineraryDao
+        itineraryDao: ItineraryDao,
+        itineraryImageDao: ItineraryImageDao // Nuevo parámetro
     ): TripRepository =
-        TripRepositoryImpl(tripDao, userDao, itineraryDao)
+        TripRepositoryImpl(tripDao, userDao, itineraryDao, itineraryImageDao)
 
     @Provides
     @Singleton
-    fun provideItineraryRepository(itineraryDao: ItineraryDao): ItineraryRepository =
-        ItineraryRepositoryImpl(itineraryDao)
+    fun provideItineraryRepository(
+        itineraryDao: ItineraryDao,
+        itineraryImageDao: ItineraryImageDao // Nuevo parámetro
+    ): ItineraryRepository =
+        ItineraryRepositoryImpl(itineraryDao, itineraryImageDao)
 
     @Provides
     @Singleton
     fun provideUserRepository(userDao: UserDao, tripDao: TripDao): UserRepository =
-        UserRepositoryImpl(userDao,tripDao)
+        UserRepositoryImpl(userDao, tripDao)
 
     @Provides
     @Singleton
