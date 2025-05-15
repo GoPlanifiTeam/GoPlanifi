@@ -5,21 +5,24 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.util.UUID
 
+/**
+ * Modelo para las imágenes asociadas a un itinerario específico
+ */
 @Entity(
-    tableName = "images",
+    tableName = "itinerary_images",
     foreignKeys = [
         ForeignKey(
-            entity = Trip::class,
+            entity = ItineraryItem::class,
             parentColumns = ["id"],
-            childColumns = ["tripId"],
+            childColumns = ["itineraryId"],
             onDelete = ForeignKey.CASCADE
         )
     ]
 )
-data class Image(
+data class ItineraryImage(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val tripId: String, // ID del viaje al que pertenece esta imagen
+    val itineraryId: String, // ID del itinerario al que pertenece esta imagen
     val imagePath: String, // Ruta de la imagen en el almacenamiento local
     val title: String? = null, // Título opcional para la imagen
     val description: String? = null // Descripción opcional

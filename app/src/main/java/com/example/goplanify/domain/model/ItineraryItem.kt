@@ -7,4 +7,5 @@ data class ItineraryItem(
     val location: String,
     val startDate: String,
     val endDate: String,
+    val images: List<ItineraryImage>? = null
 )
