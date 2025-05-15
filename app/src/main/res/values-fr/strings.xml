@@ -132,4 +132,7 @@
     <string name="trip_images">String.Trip_Images</string>
     <string name="add_images">string.add_images</string>
     <string name="no_images_added">string.no_images_added</string>
+    <string name="itinerary_images">Imágenes del itinerario</string>
+    <string name="delete_image">Eliminar imagen</string>
+
 </resources>

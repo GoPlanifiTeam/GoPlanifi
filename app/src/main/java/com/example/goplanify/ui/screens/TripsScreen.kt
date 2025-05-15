@@ -1,31 +1,41 @@
-
 package com.example.goplanify.ui.screens
 
 import android.app.DatePickerDialog
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FormatListNumbered
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.goplanify.R
+import com.example.goplanify.domain.model.ItineraryImage
 import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.ui.viewmodel.AuthViewModel
 import com.example.goplanify.ui.viewmodel.ItineraryViewModel
 import com.example.goplanify.ui.viewmodel.SettingsViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -127,9 +137,53 @@ fun TripCard(
     var newEndDate by remember { mutableStateOf(trip.endDate) }
     var updatedItineraries by remember { mutableStateOf(trip.itineraries) }
 
+    // Estado para mostrar imagen a pantalla completa
+    var selectedImage by remember { mutableStateOf<String?>(null) }
+
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     fun stringToDate(dateString: String?): Date? = try { dateFormat.parse(dateString ?: "") } catch (_: Exception) { null }
     fun isDateInFuture(date: String): Boolean = stringToDate(date)?.after(Calendar.getInstance().time) == true
+
+// Dialog para mostrar imagen a pantalla completa
+    if (selectedImage != null) {
+        AlertDialog(
+            onDismissRequest = { selectedImage = null },
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false
+            ),
+            modifier = Modifier
+                .fillMaxWidth(0.85f)       // 85% del ancho de la pantalla
+                .fillMaxHeight(0.7f)       // 70% de la altura de la pantalla
+                .padding(16.dp),
+            title = null,
+            text = {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(File(selectedImage!!)),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+            },
+            confirmButton = {
+                IconButton(
+                    onClick = { selectedImage = null },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                            RoundedCornerShape(percent = 50)
+                        )
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                }
+            },
+            dismissButton = null
+        )
+    }
 
     if (showDateDialog) {
         AlertDialog(
@@ -220,11 +274,35 @@ fun TripCard(
             Text("📅 ${stringResource(R.string.trip_start_date)}: ${trip.startDate}")
             Text("📅 ${stringResource(R.string.trip_end_date)}: ${trip.endDate}")
             Spacer(modifier = Modifier.height(8.dp))
-            trip.itineraries.forEach {
-                Text("🏷️ ${it.name} - ${it.location}")
-                Text("📅 ${it.startDate}")
-                Spacer(modifier = Modifier.height(4.dp))
+
+            // Itinerarios con sus imágenes
+            trip.itineraries.forEach { itinerary ->
+                // Encabezado del itinerario
+                Text("🏷️ ${itinerary.name} - ${itinerary.location}", style = MaterialTheme.typography.titleSmall)
+                Text("📅 ${itinerary.startDate}", style = MaterialTheme.typography.bodySmall)
+
+                // Mostrar imágenes del itinerario si existen
+                if (itinerary.images != null && itinerary.images.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(70.dp)
+                            .padding(vertical = 4.dp)
+                    ) {
+                        items(itinerary.images) { image ->
+                            ItineraryImageThumbnail(
+                                imagePath = image.imagePath,
+                                onClick = { selectedImage = image.imagePath }
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
+
             Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -250,6 +328,26 @@ fun TripCard(
                     Text("🗑️ ${stringResource(R.string.delete)}")
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ItineraryImageThumbnail(imagePath: String, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .size(60.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = rememberAsyncImagePainter(File(imagePath)),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
         }
     }
 }
