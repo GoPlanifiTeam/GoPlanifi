@@ -129,4 +129,7 @@
     <string name="select_date">Seleccionar fecha</string>
     <string name="select_language">select language</string>
     <string name="enable_notifications">enable notificacions</string>
+    <string name="trip_images">String.Trip_Images</string>
+    <string name="add_images">string.add_images</string>
+    <string name="no_images_added">string.no_images_added</string>
 </resources>

@@ -1,32 +1,51 @@
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.goplanify.ui.viewmodel.ItineraryViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
 import com.example.goplanify.R
+import com.example.goplanify.domain.model.Image
 import com.example.goplanify.domain.model.ItineraryItem
 import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.ui.screens.BottomBar
 import com.example.goplanify.ui.screens.CommonTopBar
+import com.example.goplanify.ui.utils.ImageUtils
 import com.example.goplanify.ui.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-
-
-
 
 
 @Composable
@@ -64,6 +83,7 @@ fun DatePicker(
         Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
     }
 }
+
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun ItineraryScreen(
@@ -77,6 +97,33 @@ fun ItineraryScreen(
     val trips by tripViewModel.userTrips.collectAsState()
     val allTrips by tripViewModel.trips.collectAsState()
     val selectedItineraries by itineraryViewModel.selectedItineraries.collectAsState()
+
+    // Estado para las imágenes
+    var tempImageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    var tempImages by remember { mutableStateOf<List<Image>>(emptyList()) }
+    var showImageFullScreen by remember { mutableStateOf<Image?>(null) }
+
+    val context = LocalContext.current
+
+    // Launcher para seleccionar imágenes
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        tempImageUris = tempImageUris + uris
+
+        // Guardar temporalmente las imágenes
+        uris.forEach { uri ->
+            val localPath = ImageUtils.saveImageToAppStorage(context, uri)
+            if (localPath != null) {
+                val newImage = Image(
+                    id = UUID.randomUUID().toString(),
+                    tripId = tripId ?: "temp",
+                    imagePath = localPath
+                )
+                tempImages = tempImages + newImage
+            }
+        }
+    }
 
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
@@ -117,7 +164,6 @@ fun ItineraryScreen(
             }
         }
         else -> {
-
             Log.d("ItineraryScreen", "No user or trip found.")
             emptyList()
         }
@@ -129,7 +175,6 @@ fun ItineraryScreen(
     var itineraryDatesValid by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
     var isTripStartDateValid by remember { mutableStateOf(true) }
     var isTripEndDateValid by remember { mutableStateOf(true) }
-    val context = LocalContext.current
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     fun stringToDate(dateString: String?): Date? = try { dateFormat.parse(dateString ?: "") } catch (_: Exception) { null }
     fun isDateInFuture(date: String): Boolean = stringToDate(date)?.after(Calendar.getInstance().time) == true
@@ -143,6 +188,67 @@ fun ItineraryScreen(
             false
         }
     }
+
+    // Dialog para mostrar imagen a pantalla completa
+    if (showImageFullScreen != null) {
+        AlertDialog(
+            onDismissRequest = { showImageFullScreen = null },
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            title = null,
+            text = {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(File(showImageFullScreen!!.imagePath)),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+
+                    // Botón para eliminar la imagen
+                    IconButton(
+                        onClick = {
+                            tempImages = tempImages.filter { it.id != showImageFullScreen!!.id }
+                            ImageUtils.deleteImage(showImageFullScreen!!.imagePath)
+                            showImageFullScreen = null
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .size(40.dp)
+                            .background(Color.Black.copy(alpha = 0.6f), CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Eliminar",
+                            tint = Color.White
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                IconButton(
+                    onClick = { showImageFullScreen = null },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                            CircleShape
+                        )
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                }
+            },
+            dismissButton = null
+        )
+    }
+
     Scaffold(
         topBar = { CommonTopBar(title = stringResource(R.string.itinerary), navController) },
         bottomBar = { BottomBar(navController) }
@@ -181,9 +287,102 @@ fun ItineraryScreen(
                 }
             }
 
+            // Nueva sección para agregar imágenes
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "📸 ${stringResource(R.string.trip_images)}",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+
+                            Button(
+                                onClick = { galleryLauncher.launch("image/*") },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            ) {
+                                Icon(
+                                    Icons.Default.AddPhotoAlternate,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(R.string.add_images))
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Mostrar imágenes seleccionadas
+                        if (tempImages.isNotEmpty()) {
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            ) {
+                                items(tempImages) { image ->
+                                    ImageThumbnail(
+                                        image = image,
+                                        onClick = { showImageFullScreen = image }
+                                    )
+                                }
+                            }
+                        } else {
+                            // Mostrar mensaje si no hay imágenes
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(120.dp)
+                                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
+                                    .border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        shape = RoundedCornerShape(8.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.PhotoLibrary,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(36.dp),
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.no_images_added),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (tripId == null) {
                 if (itineraries.isEmpty()) {
-
                     item {
                         Box(
                             modifier = Modifier.fillParentMaxSize(),
@@ -333,8 +532,10 @@ fun ItineraryScreen(
                                         trip = newTripId // ✅ correct trip reference
                                     )
                                 },
-                                images = null,
-                                aiRecommendations = null
+                                // Actualizar las imágenes con el ID del nuevo viaje
+                                images = tempImages.map { it.copy(tripId = newTripId) },
+                                aiRecommendations = null,
+                                imageURL = trip?.imageURL ?: "https://example.com/default-trip-image.jpg"
                             )
 
                             tripViewModel.addTrip(newTrip)
@@ -348,7 +549,26 @@ fun ItineraryScreen(
             }
         }
     }
+}
 
-
-
+@Composable
+fun ImageThumbnail(
+    image: Image,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .size(100.dp)
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = rememberAsyncImagePainter(File(image.imagePath)),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
 }
