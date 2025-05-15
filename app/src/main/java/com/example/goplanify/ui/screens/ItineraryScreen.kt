@@ -91,7 +91,8 @@ fun DatePicker(
 fun ImageThumbnail(imagePath: String, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .size(80.dp)
+            .size(60.dp)
+            .clip(RoundedCornerShape(8.dp))  // Añadido clip con bordes redondeados como en TripsScreen
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -196,6 +197,17 @@ fun ItineraryScreen(
         }
     }
 
+    // Actualiza la UI cuando cambia el mapa de imágenes procesadas
+    LaunchedEffect(processedImagesMap) {
+        if (tripId != null) {
+            currentUser?.let { user ->
+                tripViewModel.getObjectUserTrips(user)
+            }
+        } else if (currentUser != null) {
+            tripViewModel.getObjectUserTrips(currentUser!!)
+        }
+    }
+
     // If no user is authenticated, show login prompt
     if (currentUser == null) {
         Box(
@@ -295,85 +307,82 @@ fun ItineraryScreen(
     // Dialog para mostrar imagen a pantalla completa
     if (selectedImage != null) {
         val (itineraryId, imagePath) = selectedImage!!
-        Dialog(
+        AlertDialog(
             onDismissRequest = { selectedImage = null },
             properties = DialogProperties(
                 dismissOnBackPress = true,
-                dismissOnClickOutside = true
-            )
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .fillMaxHeight(0.7f)
-                    .padding(8.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface)
-                ) {
-                    // Imagen - versión simplificada sin builder
+                dismissOnClickOutside = true,
+                usePlatformDefaultWidth = false
+            ),
+            modifier = Modifier
+                .fillMaxWidth(0.85f)       // 85% del ancho de la pantalla
+                .fillMaxHeight(0.7f)       // 70% de la altura de la pantalla
+                .padding(16.dp),
+            title = null,
+            text = {
+                Box(modifier = Modifier.fillMaxSize()) {
                     Image(
                         painter = rememberAsyncImagePainter(File(imagePath)),
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Fit
                     )
-
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     // Botón para cerrar
                     IconButton(
                         onClick = { selectedImage = null },
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
                             .padding(8.dp)
-                            .size(32.dp)
                             .background(
-                                Color.Gray.copy(alpha = 0.5f),
-                                CircleShape
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                                RoundedCornerShape(percent = 50)
                             )
                     ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = "Cerrar",
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Icon(Icons.Default.Close, contentDescription = "Cerrar")
                     }
 
                     // Botón para eliminar la imagen
                     IconButton(
                         onClick = {
-                            // Eliminar la imagen del mapa de imágenes procesadas
+                            // 1. Eliminar la imagen del mapa de imágenes procesadas
                             val currentImages = processedImagesMap[itineraryId] ?: emptyList()
                             processedImagesMap = processedImagesMap + (itineraryId to currentImages.filter { it.imagePath != imagePath })
 
-                            // Eliminar el archivo
+                            // 2. Eliminar el archivo físico
                             ImageUtils.deleteImage(imagePath)
+
+                            // 3. Eliminar la referencia de la base de datos
+                            val imageToDelete = currentImages.find { it.imagePath == imagePath }
+                            imageToDelete?.let { image ->
+                                // Llamar al ViewModel para eliminar la imagen de la base de datos
+                                itineraryViewModel.deleteItineraryImage(image.id)
+                                Log.d("ItineraryScreen", "Eliminando imagen ID: ${image.id}")
+                            }
+
                             selectedImage = null
+
+                            // 4. Notificar al ViewModel que actualice los itinerarios
+                            currentUser?.let { tripViewModel.getObjectUserTrips(it) }
                         },
                         modifier = Modifier
-                            .align(Alignment.BottomEnd)
                             .padding(8.dp)
-                            .size(36.dp)
                             .background(
-                                Color.Red.copy(alpha = 0.6f),
-                                CircleShape
+                                Color.Red.copy(alpha = 0.7f),
+                                RoundedCornerShape(percent = 50)
                             )
                     ) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = "Eliminar",
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color.White)
                     }
                 }
-            }
-        }
+            },
+            dismissButton = null
+        )
     }
 
     Scaffold(
@@ -447,7 +456,7 @@ fun ItineraryScreen(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .height(80.dp)
+                                                .height(70.dp)
                                         ) {
                                             items(images) { image ->
                                                 ImageThumbnail(
@@ -573,7 +582,8 @@ fun ItineraryScreen(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 8.dp)
+                                        .height(70.dp)
+                                        .padding(vertical = 4.dp)
                                 ) {
                                     items(allImages) { image ->
                                         ImageThumbnail(
