@@ -27,6 +27,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        testOptions {
+            unitTests.isReturnDefaultValues = true
+        }
     }
 
     buildFeatures{
@@ -68,6 +72,13 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
+    
+    // Retrofit dependencies
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    
     val room_version = "2.6.1"
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
@@ -100,7 +111,14 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.10.1") //Esto es por que se metmos datos por Json
     // Add Hilt navigation and viewmodel support
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")    
+    
+    // Testing dependencies for API
     testImplementation(kotlin("test"))
-
+    testImplementation("org.mockito:mockito-core:4.11.0")
+    testImplementation("org.mockito:mockito-inline:4.11.0") {
+        because("Required for mocking final classes")
+    }
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
 }

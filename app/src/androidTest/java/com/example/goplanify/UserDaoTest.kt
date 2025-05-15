@@ -44,7 +44,13 @@ class UserDaoTest {
             password = "password123",
             firstName = "Test",
             lastName = "User",
-            imageURL = ""
+            imageURL = "",
+            username = TODO(),
+            birthDate = TODO(),
+            address = TODO(),
+            country = TODO(),
+            phoneNumber = TODO(),
+            acceptEmails = TODO()
         )
         userDao.insertUser(user)
         val result = userDao.getUserById("user123")
