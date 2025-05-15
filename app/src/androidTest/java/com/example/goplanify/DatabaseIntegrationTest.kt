@@ -52,7 +52,13 @@ class DatabaseIntegrationTest {
             password = "password123",
             firstName = "Demo",
             lastName = "Tester",
-            imageURL = ""
+            imageURL = "",
+            username = TODO(),
+            birthDate = TODO(),
+            address = TODO(),
+            country = TODO(),
+            phoneNumber = TODO(),
+            acceptEmails = TODO()
         )
         userDao.insertUser(user)
 
@@ -100,7 +106,13 @@ class DatabaseIntegrationTest {
             password = "pass123",
             firstName = "Dup",
             lastName = "User",
-            imageURL = ""
+            imageURL = "",
+            username = TODO(),
+            birthDate = TODO(),
+            address = TODO(),
+            country = TODO(),
+            phoneNumber = TODO(),
+            acceptEmails = TODO()
         )
         userDao.insertUser(user)
         userDao.insertUser(user)
