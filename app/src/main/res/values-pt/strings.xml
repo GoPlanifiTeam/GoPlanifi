@@ -128,10 +128,10 @@
     <string name="select_date">Selecionar data</string>
     <string name="select_language">select language</string>
     <string name="enable_notifications">enable notificacions</string>
-    <string name="trip_images">String.Trip_Images</string>
-    <string name="add_images">string.add_images</string>
-    <string name="no_images_added">string.no_images_added</string>
-    <string name="itinerary_images">Imágenes del itinerario</string>
-    <string name="delete_image">Eliminar imagen</string>
+    <string name="trip_images">Imagens da viagem</string>
+    <string name="add_images">Adicionar imagens</string>
+    <string name="no_images_added">Nenhuma imagem adicionada</string>
+    <string name="itinerary_images">Imagens do itinerário</string>
+    <string name="delete_image">Excluir imagem</string>
 
 </resources>

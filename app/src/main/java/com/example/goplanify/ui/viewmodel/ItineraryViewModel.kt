@@ -49,12 +49,16 @@ class ItineraryViewModel @Inject constructor(
         }
     }
 
-
     fun deleteItineraryItem(itineraryId: String, tripId: String) {
         viewModelScope.launch {
             itineraryRepository.deleteItineraryItem(itineraryId)
             fetchItineraryItems(tripId)
         }
     }
-}
 
+    fun deleteItineraryImage(imageId: String) {
+        viewModelScope.launch {
+            itineraryRepository.deleteImageFromItinerary(imageId)
+        }
+    }
+}
