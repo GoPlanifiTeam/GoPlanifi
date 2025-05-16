@@ -35,7 +35,7 @@ interface HotelApiService {
         @Body request: ReserveRequestDto
     ): Response<Any>
 
-    @GET("hotels/{group_id}/reservations")
+    @GET("hotels/{group_id}/list_reservations")
     suspend fun getReservations(
         @Path("group_id") groupId: String = "G02",
         @Query("guest_email") guestEmail: String? = null

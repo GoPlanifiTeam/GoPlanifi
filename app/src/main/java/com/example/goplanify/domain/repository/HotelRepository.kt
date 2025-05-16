@@ -1,6 +1,7 @@
 package com.example.goplanify.domain.repository
 
 import com.example.goplanify.domain.model.Hotel
+import com.example.goplanify.domain.model.Reservation
 import com.example.goplanify.utils.Resource
 
 interface HotelRepository {    suspend fun getHotelAvailability(
@@ -29,4 +30,9 @@ interface HotelRepository {    suspend fun getHotelAvailability(
         roomId: String,
         reservationId: String
     ): Resource<Boolean>
+
+    suspend fun getReservations(
+        groupId: String,
+        guestEmail: String? = null
+    ): Resource<List<Reservation>>
 }

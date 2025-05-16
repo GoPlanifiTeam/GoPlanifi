@@ -5,6 +5,7 @@ import com.example.goplanify.data.remote.api.HotelApiService
 import com.example.goplanify.data.remote.dto.ReserveRequestDto
 import com.example.goplanify.data.remote.mapper.toDomain
 import com.example.goplanify.domain.model.Hotel
+import com.example.goplanify.domain.model.Reservation
 import com.example.goplanify.domain.repository.HotelRepository
 import com.example.goplanify.utils.Resource
 import retrofit2.HttpException
@@ -160,6 +161,27 @@ class HotelRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Unknown error while cancelling reservation", e)
             Resource.Error("Unknown error: ${e.message}")
+        }
+    }
+
+    override suspend fun getReservations(
+        groupId: String,
+        guestEmail: String?
+    ): Resource<List<Reservation>> {
+        return try {
+            val response = apiService.getReservations(groupId, guestEmail)
+            if (response.isSuccessful) {
+                val reservations = response.body()
+                if (reservations != null) {
+                    Resource.Success(reservations.map { it.toDomain() })
+                } else {
+                    Resource.Error("Response body is null")
+                }
+            } else {
+                Resource.Error("Error: ${response.code()}: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            handleException(e, "getting reservations")
         }
     }
 

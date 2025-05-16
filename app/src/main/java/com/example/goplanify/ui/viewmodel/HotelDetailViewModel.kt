@@ -156,8 +156,8 @@ class HotelDetailViewModel @Inject constructor(
                     roomId = room.id,
                     startDate = startDate,
                     endDate = endDate,
-                    guestName = "Tu Nombre", // Cambia por el nombre del usuario
-                    guestEmail = "tu@email.com" // Cambia por el email del usuario
+                    guestName = "Daniel",
+                    guestEmail = "danielgraogg@gmail.com"
                 )
 
                 val result = hotelRepository.reserveRoom(
@@ -166,8 +166,8 @@ class HotelDetailViewModel @Inject constructor(
                     roomId = room.id,
                     startDate = startDate,
                     endDate = endDate,
-                    guestName = "Tu Nombre", // Cambia por el nombre del usuario
-                    guestEmail = "tu@email.com" // Cambia por el email del usuario
+                    guestName = "Daniel",
+                    guestEmail = "danielgraogg@gmail.com"
                 )
 
                 when (result) {
