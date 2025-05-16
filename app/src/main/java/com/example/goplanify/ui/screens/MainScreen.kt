@@ -317,8 +317,8 @@ fun BottomBar(navController: NavController) {
     NavigationBar {
         // Home item
         NavigationBarItem(
-            icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-            label = { Text("Home") },
+            icon = { Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.mainApp)) },
+            label = { Text(stringResource(R.string.menu)) },
             selected = currentRoute == "Home",
             onClick = {
                 navController.navigate("Home") {
@@ -332,7 +332,7 @@ fun BottomBar(navController: NavController) {
             }
         )
 
-        // Book Hotels item
+        // Book Hotels item (nuevo)
         NavigationBarItem(
             icon = { Icon(Icons.Filled.Search, contentDescription = "Book Hotels") },
             label = { Text("Hotels") },
@@ -344,25 +344,37 @@ fun BottomBar(navController: NavController) {
             }
         )
 
-        // Reservations item
+        // Trips/Itinerary item
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.FormatListNumbered, contentDescription = stringResource(R.string.itinerary)) },
+            label = { Text(stringResource(R.string.list)) },
+            selected = currentRoute == "ItineraryScreen" || currentRoute?.startsWith("ItineraryScreen?") == true,
+            onClick = {
+                navController.navigate("ItineraryScreen") {
+                    launchSingleTop = true
+                }
+            }
+        )
+
+        // My Trips item
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Luggage, contentDescription = stringResource(R.string.myTrips)) },
+            label = { Text(stringResource(R.string.profileScreen)) },
+            selected = currentRoute == "tripsScreen",
+            onClick = {
+                navController.navigate("tripsScreen") {
+                    launchSingleTop = true
+                }
+            }
+        )
+
+        // Reservations item (nuevo)
         NavigationBarItem(
             icon = { Icon(Icons.Filled.ListAlt, contentDescription = "Reservations") },
             label = { Text("Reservations") },
             selected = currentRoute == "reservations",
             onClick = {
                 navController.navigate("reservations") {
-                    launchSingleTop = true
-                }
-            }
-        )
-
-        // Trips item
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Luggage, contentDescription = "Trips") },
-            label = { Text("Trips") },
-            selected = currentRoute == "tripsScreen",
-            onClick = {
-                navController.navigate("tripsScreen") {
                     launchSingleTop = true
                 }
             }
