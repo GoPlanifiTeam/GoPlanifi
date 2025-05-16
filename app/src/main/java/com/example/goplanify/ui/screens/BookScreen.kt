@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -127,11 +128,14 @@ fun BookScreen(
         Spacer(Modifier.height(16.dp))
 
         // Mostrar indicador de carga o resultados
-        if (uiState.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(androidx.compose.ui.Alignment.CenterHorizontally)
-            )
-        } else {
+        if (uiState.loading) {  // Nota: 'loading' en lugar de 'isLoading'
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }else {
             // Lista de hoteles
             LazyColumn {
                 items(uiState.hotels) { hotel ->

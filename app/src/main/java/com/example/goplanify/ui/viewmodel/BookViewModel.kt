@@ -31,13 +31,16 @@ class BookViewModel @Inject constructor(
     private val hotelRepository: HotelRepository
 ) : ViewModel() {
 
-    // Grupo ID para la API
-    val groupId = "G02" // Puedes cambiarlo por BuildConfig.GROUP_ID si lo tienes definido
+    // Opción 1: Define como constante en lugar de val
+    companion object {
+        const val GROUP_ID = "G02" // Puedes cambiarlo por BuildConfig.GROUP_ID si lo tienes definido
+    }
 
     private val _uiState = MutableStateFlow(BookUIState())
     val uiState: StateFlow<BookUIState> = _uiState
 
-    fun getGroupId() = groupId
+    // Método para obtener el groupId
+    fun getGroupId() = GROUP_ID
 
     /* ---------- city picker ---------- */
     fun toggleCityMenu() = _uiState.update { it.copy(cityMenuExpanded = !it.cityMenuExpanded) }
@@ -74,7 +77,7 @@ class BookViewModel @Inject constructor(
                 checkIn = startDate.format(formatter),
                 checkOut = endDate.format(formatter),
                 guests = 2,
-                groupId = groupId
+                groupId = GROUP_ID
             )
 
             when (result) {
