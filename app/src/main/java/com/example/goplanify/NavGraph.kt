@@ -7,6 +7,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -15,6 +16,10 @@ import com.example.goplanify.ui.screens.*
 import com.example.goplanify.ui.viewmodel.AuthViewModel
 import com.example.goplanify.ui.viewmodel.SettingsViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
+import com.example.goplanify.ui.screens.BookScreen
+import com.example.goplanify.ui.screens.HotelDetailScreen
+import com.example.goplanify.ui.screens.ReservationsScreen
+import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,6 +52,34 @@ fun NavGraph(navController: NavHostController) {
         composable("Terms") { TermsAndConditionsScreen(navController) }
         composable("loginScreen") { LoginScreen(navController) }
         composable("signupScreen") { SignupScreen(navController) }
+        composable("book") { BookScreen(navController) }
+
+        composable(
+            route = "hotel/{hotelId}/{groupId}/{startDate}/{endDate}",
+            arguments = listOf(
+                navArgument("hotelId") { type = NavType.StringType },
+                navArgument("groupId") { type = NavType.StringType },
+                navArgument("startDate") { type = NavType.StringType },
+                navArgument("endDate") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val hotelId = backStackEntry.arguments?.getString("hotelId") ?: ""
+            val groupId = backStackEntry.arguments?.getString("groupId") ?: "G02"
+            val startDate = backStackEntry.arguments?.getString("startDate") ?: ""
+            val endDate = backStackEntry.arguments?.getString("endDate") ?: ""
+
+            HotelDetailScreen(
+                hotelId = hotelId,
+                groupId = groupId,
+                startDateStr = startDate,
+                endDateStr = endDate,
+                navController = navController
+            )
+        }
+
+        composable("reservations") {
+            ReservationsScreen(navController)
+        }
 
         composable(
             route = "ItineraryScreen?tripId={tripId}",

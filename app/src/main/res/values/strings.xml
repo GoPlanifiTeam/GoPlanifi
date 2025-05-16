@@ -139,4 +139,11 @@
     <string name="itinerary_images">Itinerary Images</string>
     <string name="delete_image">Delete image</string>
 
+    <string name="book_hotels">Book Hotels</string>
+    <string name="my_reservations">My Reservations</string>
+    <string name="hotels_accommodations">Hotels &amp; Accommodations</string>
+    <string name="hotels_description">Find and book hotels in London, Paris, or Barcelona for your next trip.</string>
+    <string name="search_hotels">Search Hotels</string>
+    <string name="hotels">Hotels</string>
+
 </resources>

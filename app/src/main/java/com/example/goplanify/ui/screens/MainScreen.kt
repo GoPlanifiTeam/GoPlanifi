@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -21,12 +22,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.goplanify.R
 import com.example.goplanify.domain.model.User
 import com.example.goplanify.ui.viewmodel.AuthViewModel
 import com.example.goplanify.ui.viewmodel.ItineraryViewModel
 import com.example.goplanify.ui.viewmodel.TripViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ListAlt
+import androidx.compose.material.icons.filled.Luggage
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun MainScreen(
@@ -47,7 +53,6 @@ fun MainScreen(
                 Log.e("MainScreen", "Admin user not found in the database.")
             }
         }
-
     }
     val currentUser by authViewModel.currentUser.collectAsState()
     val trips by tripViewModel.userTrips.collectAsState()
@@ -79,6 +84,62 @@ fun MainScreen(
                         tripId = trip.id,
                         tripName = trip.destination
                     )
+                }
+
+                // New: Hotel booking feature card
+                item {
+                    HotelFeatureCard(navController)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HotelFeatureCard(navController: NavController) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Hotels & Accommodations",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Find and book hotels in London, Paris, or Barcelona for your next trip.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = { navController.navigate("book") },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(Icons.Filled.Search, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Search Hotels")
+                }
+
+                Button(
+                    onClick = { navController.navigate("reservations") },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(Icons.Filled.ListAlt, contentDescription = null)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("My Reservations")
                 }
             }
         }
@@ -193,6 +254,17 @@ fun CommonTopBar(title: String, navController: NavController) {
                 expanded = showSettingsMenu,
                 onDismissRequest = { showSettingsMenu = false }
             ) {
+                // Add Hotel Booking option to menu
+                DropdownMenuItem(
+                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Book Hotels") },
+                    text = { Text("Book Hotels") },
+                    onClick = {
+                        showSettingsMenu = false
+                        navController.navigate("book")
+                    }
+                )
+
+                // Existing menu items
                 DropdownMenuItem(
                     leadingIcon = { Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.aboutScreen)) },
                     text = { Text(stringResource(R.string.aboutScreen)) },
@@ -236,4 +308,70 @@ fun CommonTopBar(title: String, navController: NavController) {
             }
         }
     )
+}
+
+@Composable
+fun BottomBar(navController: NavController) {
+    val currentRoute = currentRoute(navController)
+
+    NavigationBar {
+        // Home item
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+            label = { Text("Home") },
+            selected = currentRoute == "Home",
+            onClick = {
+                navController.navigate("Home") {
+                    // Avoid creating multiple instances of the same destination
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        )
+
+        // Book Hotels item
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Search, contentDescription = "Book Hotels") },
+            label = { Text("Hotels") },
+            selected = currentRoute == "book" || currentRoute?.startsWith("hotel/") == true,
+            onClick = {
+                navController.navigate("book") {
+                    launchSingleTop = true
+                }
+            }
+        )
+
+        // Reservations item
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.ListAlt, contentDescription = "Reservations") },
+            label = { Text("Reservations") },
+            selected = currentRoute == "reservations",
+            onClick = {
+                navController.navigate("reservations") {
+                    launchSingleTop = true
+                }
+            }
+        )
+
+        // Trips item
+        NavigationBarItem(
+            icon = { Icon(Icons.Filled.Luggage, contentDescription = "Trips") },
+            label = { Text("Trips") },
+            selected = currentRoute == "tripsScreen",
+            onClick = {
+                navController.navigate("tripsScreen") {
+                    launchSingleTop = true
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun currentRoute(navController: NavController): String? {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    return navBackStackEntry?.destination?.route
 }

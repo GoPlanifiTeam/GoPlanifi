@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.goplanify.BuildConfig
 import com.example.goplanify.domain.model.Reservation
@@ -28,6 +29,7 @@ import java.time.temporal.ChronoUnit
 
 @Composable
 fun ReservationsScreen(
+    navController: NavController,
     viewModel: ReservationsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
