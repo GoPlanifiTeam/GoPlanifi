@@ -57,6 +57,22 @@ android {
         compose = true
     }
 
+    buildTypes {
+        debug{
+            buildConfigField("String", "HOTELS_API_URL", "\"http://13.39.162.212\"")
+            buildConfigField("String", "GROUP_ID", "\"G02\"")
+        }
+        release {
+            buildConfigField("String", "GROUP_ID", "\"G02\"")
+            buildConfigField("String", "HOTELS_API_URL", "\"http://13.39.162.212\"")
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     // Add this to fix Hilt compiler issues
     kapt {
         correctErrorTypes = true

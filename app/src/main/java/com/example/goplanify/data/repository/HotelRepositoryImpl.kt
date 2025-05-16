@@ -2,8 +2,8 @@ package com.example.goplanify.data.repository
 
 import android.util.Log
 import com.example.goplanify.data.remote.api.HotelApiService
+import com.example.goplanify.data.remote.dto.ReserveRequestDto
 import com.example.goplanify.data.remote.mapper.toDomain
-import com.example.goplanify.data.remote.model.ReserveRequest
 import com.example.goplanify.domain.model.Hotel
 import com.example.goplanify.domain.repository.HotelRepository
 import com.example.goplanify.utils.Resource
@@ -27,12 +27,12 @@ class HotelRepositoryImpl @Inject constructor(
         groupId: String
     ): Resource<List<Hotel>> {
         return try {
-            val response = apiService.getHotelAvailability(destination, checkIn, checkOut, guests)
+            val response = apiService.getHotelAvailability(destination, checkIn, checkOut, guests, groupId)
             if (response.isSuccessful) {
-                val hotelResponse = response.body()
-                if (hotelResponse != null) {
-                    Log.d(TAG, "Successfully fetched ${hotelResponse.hotels.size} hotels")
-                    Resource.Success(hotelResponse.hotels.map { it.toDomain() })
+                val availabilityResponse = response.body()
+                if (availabilityResponse != null) {
+                    Log.d(TAG, "Successfully fetched ${availabilityResponse.available_hotels.size} hotels")
+                    Resource.Success(availabilityResponse.available_hotels.map { it.toDomain() })
                 } else {
                     Log.e(TAG, "Response body is null for hotel availability")
                     Resource.Error("Response body is null")
@@ -57,10 +57,10 @@ class HotelRepositoryImpl @Inject constructor(
         return try {
             val response = apiService.getHotels(groupId)
             if (response.isSuccessful) {
-                val hotelsResponse = response.body()
-                if (hotelsResponse != null) {
-                    Log.d(TAG, "Successfully fetched ${hotelsResponse.hotels.size} hotels")
-                    Resource.Success(hotelsResponse.hotels.map { it.toDomain() })
+                val hotels = response.body()
+                if (hotels != null) {
+                    Log.d(TAG, "Successfully fetched ${hotels.size} hotels")
+                    Resource.Success(hotels.map { it.toDomain() })
                 } else {
                     Log.e(TAG, "Response body is null for hotel list")
                     Resource.Error("Response body is null")
@@ -91,19 +91,21 @@ class HotelRepositoryImpl @Inject constructor(
         guestEmail: String
     ): Resource<String> {
         return try {
-            val request = ReserveRequest(
-                hotelId = hotelId,
-                roomId = roomId,                startDate = startDate,
-                endDate = endDate,
-                guestName = guestName,
-                guestEmail = guestEmail
+            val request = ReserveRequestDto(
+                hotel_id = hotelId,
+                room_id = roomId,
+                start_date = startDate,
+                end_date = endDate,
+                guest_name = guestName,
+                guest_email = guestEmail
             )
-              val response = apiService.reserveRoom(groupId, request)
+
+            val response = apiService.reserveRoom(groupId, request)
             if (response.isSuccessful) {
                 val reservationResponse = response.body()
                 if (reservationResponse != null) {
                     Log.d(TAG, "Successfully created reservation")
-                    Resource.Success(reservationResponse.reservationId) // Use reservationId instead of id
+                    Resource.Success(reservationResponse.reservation.id)
                 } else {
                     Log.e(TAG, "Response body is null for reservation")
                     Resource.Error("Response body is null")
@@ -132,13 +134,13 @@ class HotelRepositoryImpl @Inject constructor(
     ): Resource<Boolean> {
         return try {
             // Since we need reservation details for cancellation according to the API
-            val request = ReserveRequest(
-                hotelId = hotelId,
-                roomId = roomId,
-                startDate = "", // Not used for cancellation
-                endDate = "",   // Not used for cancellation
-                guestName = "", // Not used for cancellation
-                guestEmail = ""  // Not used for cancellation
+            val request = ReserveRequestDto(
+                hotel_id = hotelId,
+                room_id = roomId,
+                start_date = "", // Not used for cancellation
+                end_date = "",   // Not used for cancellation
+                guest_name = "", // Not used for cancellation
+                guest_email = ""  // Not used for cancellation
             )
 
             val response = apiService.cancelReservation(groupId, request)
@@ -158,6 +160,24 @@ class HotelRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Unknown error while cancelling reservation", e)
             Resource.Error("Unknown error: ${e.message}")
+        }
+    }
+
+    // Helper function to handle exceptions
+    private fun <T> handleException(e: Exception, action: String): Resource<T> {
+        return when (e) {
+            is HttpException -> {
+                Log.e(TAG, "HTTP error while $action", e)
+                Resource.Error("HTTP error: ${e.message}")
+            }
+            is IOException -> {
+                Log.e(TAG, "Network error while $action", e)
+                Resource.Error("Network error: ${e.message}")
+            }
+            else -> {
+                Log.e(TAG, "Unknown error while $action", e)
+                Resource.Error("Unknown error: ${e.message}")
+            }
         }
     }
 }
