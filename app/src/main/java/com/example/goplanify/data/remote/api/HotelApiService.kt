@@ -11,11 +11,11 @@ import retrofit2.http.*
 interface HotelApiService {
     @GET("hotels/{group_id}/availability")
     suspend fun getHotelAvailability(
+        @Path("group_id") groupId: String = "G02",
         @Query("city") city: String,
         @Query("start_date") startDate: String,
         @Query("end_date") endDate: String,
-        @Query("guests") guests: Int,
-        @Path("group_id") groupId: String = "G02"
+        @Query("guests") guests: Int
     ): Response<AvailabilityResponseDto>
 
     @GET("hotels/{group_id}/hotels")

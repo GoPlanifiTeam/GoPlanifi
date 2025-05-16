@@ -27,7 +27,7 @@ class HotelRepositoryImpl @Inject constructor(
         groupId: String
     ): Resource<List<Hotel>> {
         return try {
-            val response = apiService.getHotelAvailability(destination, checkIn, checkOut, guests, groupId)
+            val response = apiService.getHotelAvailability(groupId, destination, checkIn, checkOut, guests)
             if (response.isSuccessful) {
                 val availabilityResponse = response.body()
                 if (availabilityResponse != null) {
