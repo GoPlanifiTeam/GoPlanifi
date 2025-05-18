@@ -43,127 +43,133 @@ fun ReservationsScreen(
         viewModel.updateCurrentUser(currentUser)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Encabezado
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+    Scaffold(
+        topBar = { CommonTopBar(title = "My Reservations", navController) },
+        bottomBar = { BottomBar(navController) }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            Text(
-                text = "My Reservations",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
+            // Encabezado
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(
+                    text = "My Reservations",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
+                )
 
-            // Botón de recarga
-            IconButton(onClick = { viewModel.loadReservations() }) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Reload"
+                // Botón de recarga
+                IconButton(onClick = { viewModel.loadReservations() }) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Reload"
+                    )
+                }
+            }
+
+            // User info
+            currentUser?.let {
+                Text(
+                    text = "Reservations for: ${it.email}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
-        }
 
-        // User info
-        currentUser?.let {
-            Text(
-                text = "Reservations for: ${it.email}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
-
-        // Lista de reservas
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.reservations.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No reservations found")
-            }
-        } else {
-            LazyColumn {
-                items(uiState.reservations) { reservation ->
-                    // Elemento de reserva directamente en LazyColumn
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Column(Modifier.padding(16.dp)) {
-                            // Información del hotel y fechas
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                // Imagen del hotel (si está disponible)
-                                reservation.hotel.imageUrl?.let { url ->
-                                    Image(
-                                        painter = rememberAsyncImagePainter(base + url),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(80.dp)
-                                            .padding(end = 16.dp)
-                                    )
-                                }
-
-                                // Detalles de la reserva
-                                Column(
-                                    modifier = Modifier.weight(1f)
+            // Lista de reservas
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.reservations.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No reservations found")
+                }
+            } else {
+                LazyColumn {
+                    items(uiState.reservations) { reservation ->
+                        // Elemento de reserva directamente en LazyColumn
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Column(Modifier.padding(16.dp)) {
+                                // Información del hotel y fechas
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Text(
-                                        text = reservation.hotel.name,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text("Room: ${reservation.room.roomType}")
+                                    // Imagen del hotel (si está disponible)
+                                    reservation.hotel.imageUrl?.let { url ->
+                                        Image(
+                                            painter = rememberAsyncImagePainter(base + url),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .size(80.dp)
+                                                .padding(end = 16.dp)
+                                        )
+                                    }
 
-                                    // Calcular noches y precio total
-                                    val formatter = DateTimeFormatter.ISO_DATE
-                                    val startDate = LocalDate.parse(reservation.startDate, formatter)
-                                    val endDate = LocalDate.parse(reservation.endDate, formatter)
-                                    val nights = ChronoUnit.DAYS.between(startDate, endDate).toInt()
-                                    val totalPrice = reservation.room.price * nights
+                                    // Detalles de la reserva
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = reservation.hotel.name,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text("Room: ${reservation.room.roomType}")
 
-                                    Text("${reservation.startDate} to ${reservation.endDate}")
-                                    Text("${nights} nights - Total: ${totalPrice}€")
-                                }
+                                        // Calcular noches y precio total
+                                        val formatter = DateTimeFormatter.ISO_DATE
+                                        val startDate = LocalDate.parse(reservation.startDate, formatter)
+                                        val endDate = LocalDate.parse(reservation.endDate, formatter)
+                                        val nights = ChronoUnit.DAYS.between(startDate, endDate).toInt()
+                                        val totalPrice = reservation.room.price * nights
 
-                                // Botón para cancelar la reserva
-                                IconButton(onClick = { viewModel.cancelReservation(reservation) }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Cancel,
-                                        contentDescription = "Cancel Reservation"
-                                    )
+                                        Text("${reservation.startDate} to ${reservation.endDate}")
+                                        Text("${nights} nights - Total: ${totalPrice}€")
+                                    }
+
+                                    // Botón para cancelar la reserva
+                                    IconButton(onClick = { viewModel.cancelReservation(reservation) }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Cancel,
+                                            contentDescription = "Cancel Reservation"
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
 
-        // Mensaje de error
-        uiState.errorMessage?.let { error ->
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+            // Mensaje de error
+            uiState.errorMessage?.let { error ->
+                Text(
+                    text = error,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }

@@ -39,6 +39,7 @@ import com.example.goplanify.domain.model.Image
 import com.example.goplanify.domain.model.ItineraryImage
 import com.example.goplanify.domain.model.ItineraryItem
 import com.example.goplanify.domain.model.Trip
+import com.example.goplanify.ui.screens.BottomBar
 import com.example.goplanify.ui.screens.CommonTopBar
 import com.example.goplanify.ui.utils.ImageUtils
 import com.example.goplanify.utils.*
@@ -142,30 +143,6 @@ fun ImagePlaceholder() {
     }
 }
 
-@Composable
-fun BottomBar(navController: NavController) {
-    NavigationBar {
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.trip)) },
-            selected = false,
-            onClick = { navController.navigate("home") },
-            label = { Text(stringResource(R.string.menu)) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.FormatListNumbered, contentDescription = stringResource(R.string.itinerary)) },
-            selected = false,
-            onClick = { navController.navigate("ItineraryScreen") },
-            label = { Text(stringResource(R.string.list)) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.myTrips)) },
-            selected = false,
-            onClick = { navController.navigate("tripsScreen") },
-            label = { Text(stringResource(R.string.profileScreen)) }
-        )
-    }
-}
-
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun ItineraryScreen(
@@ -210,15 +187,22 @@ fun ItineraryScreen(
 
     // If no user is authenticated, show login prompt
     if (currentUser == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = stringResource(R.string.no_user_logged_in))
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { navController.navigate("loginScreen") }) {
-                    Text(text = "Login")
+        Scaffold(
+            topBar = { CommonTopBar(title = stringResource(R.string.itinerary), navController) },
+            bottomBar = { BottomBar(navController) }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = stringResource(R.string.no_user_logged_in))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { navController.navigate("loginScreen") }) {
+                        Text(text = "Login")
+                    }
                 }
             }
         }
@@ -396,6 +380,7 @@ fun ItineraryScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Contenido de LazyColumn que ya existe - lo dejo igual
             item {
                 if (tripId != null) {
                     Card(
@@ -695,7 +680,9 @@ fun ItineraryScreen(
                             navController.navigate("tripsScreen")
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
                 ) {
                     Text(text = stringResource(R.string.save))
                 }
