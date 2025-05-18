@@ -22,7 +22,8 @@ fun Trip.toEntity(): TripEntity =
         itinerariesJson = gson.toJson(itineraries),
         imagesJson = gson.toJson(images),
         recommendationsJson = gson.toJson(aiRecommendations),
-        imageURL = imageURL
+        imageURL = imageURL,
+        linkedReservationId = linkedReservationId  // Added linkedReservationId
     )
 
 // De entidad a dominio
@@ -37,7 +38,8 @@ fun TripEntity.toDomain(): Trip =
         images = gson.fromJson(imagesJson, object : com.google.gson.reflect.TypeToken<List<Image>>() {}.type),
         aiRecommendations = gson.fromJson(recommendationsJson, object : com.google.gson.reflect.TypeToken<List<AIRecommendations>>() {}.type),
         imageURL = imageURL,
-        map = null
+        map = null,
+        linkedReservationId = linkedReservationId  // Added linkedReservationId
     )
 
 fun TripEntity.toDomain(user: User?, itineraries: List<ItineraryItem>): Trip =
@@ -51,7 +53,8 @@ fun TripEntity.toDomain(user: User?, itineraries: List<ItineraryItem>): Trip =
         images = gson.fromJson(imagesJson, object : TypeToken<List<Image>>() {}.type),
         aiRecommendations = gson.fromJson(recommendationsJson, object : TypeToken<List<AIRecommendations>>() {}.type),
         imageURL = imageURL,
-        map = null
+        map = null,
+        linkedReservationId = linkedReservationId  // Added linkedReservationId
     )
 
 

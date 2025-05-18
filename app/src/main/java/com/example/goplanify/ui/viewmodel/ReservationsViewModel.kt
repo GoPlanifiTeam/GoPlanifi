@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.goplanify.data.local.mapper.toDomain
 import com.example.goplanify.domain.model.Reservation
+import com.example.goplanify.domain.model.Trip
 import com.example.goplanify.domain.model.User
 import com.example.goplanify.domain.repository.HotelRepository
 import com.example.goplanify.utils.Resource
@@ -19,7 +20,8 @@ data class ReservationsUIState(
     val reservations: List<Reservation> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isOfflineMode: Boolean = false
+    val isOfflineMode: Boolean = false,
+    val linkedTrips: Map<String, Trip> = emptyMap() // Map of reservation ID to linked Trip
 )
 
 @HiltViewModel
@@ -91,14 +93,57 @@ class ReservationsViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
 
             try {
-                // Ahora solo pasamos el ID de la reserva directamente
+                // Cancel on the server
                 val result = hotelRepository.cancelReservation(reservation.id)
 
                 when (result) {
                     is Resource.Success -> {
-                        // Si la cancelación en el servidor fue exitosa, eliminar de la base de datos local
+                        // If cancellation succeeds, delete from local database
                         hotelRepository.deleteLocalReservation(reservation.id)
-                        loadReservations() // Recargar para actualizar la UI
+                        loadReservations() // Reload to update UI
+                    }
+                    is Resource.Error -> {
+                        _uiState.update {
+                            it.copy(
+                                errorMessage = result.message ?: "Error cancelling reservation",
+                                isLoading = false
+                            )
+                        }
+                    }
+                    else -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ReservationsViewModel", "Error: ${e.message}")
+                _uiState.update {
+                    it.copy(
+                        errorMessage = "Error: ${e.message}",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    // Method to cancel reservation and related trip
+    fun cancelReservationWithLinkedTrip(reservation: Reservation, tripViewModel: TripViewModel) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            try {
+                // Cancel on the server
+                val result = hotelRepository.cancelReservation(reservation.id)
+
+                when (result) {
+                    is Resource.Success -> {
+                        // If cancellation succeeds, delete from local database
+                        hotelRepository.deleteLocalReservation(reservation.id)
+
+                        // Also delete the linked trip
+                        tripViewModel.deleteTripByReservationId(reservation.id)
+
+                        loadReservations() // Reload to update UI
                     }
                     is Resource.Error -> {
                         _uiState.update {
@@ -151,5 +196,14 @@ class ReservationsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    // Function to update linked trips in the UI state
+    fun updateLinkedTrips(trips: List<Trip>) {
+        val linkedTripsMap = trips
+            .filter { it.linkedReservationId != null }
+            .associateBy { it.linkedReservationId!! }
+
+        _uiState.update { it.copy(linkedTrips = linkedTripsMap) }
     }
 }
