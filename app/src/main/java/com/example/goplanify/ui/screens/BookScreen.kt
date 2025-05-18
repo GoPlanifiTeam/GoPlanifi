@@ -39,7 +39,7 @@ fun BookScreen(
     val base = BuildConfig.HOTELS_API_URL.trimEnd('/')
 
     Scaffold(
-        topBar = { CommonTopBar(title = "Book Hotels", navController) },
+        topBar = { CommonTopBar(title = "Hotels", navController) },
         bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
         Column(

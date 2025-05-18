@@ -174,7 +174,7 @@ fun ReservationsScreen(
     }
 
     Scaffold(
-        topBar = { CommonTopBar(title = "My Reservations", navController) },
+        topBar = { CommonTopBar(title = "List", navController) },
         bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
         Column(

@@ -139,7 +139,7 @@ fun HotelFeatureCard(navController: NavController) {
                 ) {
                     Icon(Icons.Filled.ListAlt, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("My Reservations")
+                    Text("Reservations")
                 }
             }
         }
@@ -257,7 +257,7 @@ fun CommonTopBar(title: String, navController: NavController) {
                 // Add Hotel Booking option to menu
                 DropdownMenuItem(
                     leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Book Hotels") },
-                    text = { Text("Book Hotels") },
+                    text = { Text("Hotels") },
                     onClick = {
                         showSettingsMenu = false
                         navController.navigate("book")

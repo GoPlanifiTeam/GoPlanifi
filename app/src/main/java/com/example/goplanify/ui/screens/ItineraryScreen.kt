@@ -58,9 +58,9 @@ fun DatePicker(
     onDateSelected: (String) -> Unit,
     currentDate: String,
     tripStartDate: String,
-    tripEndDate: String
+    tripEndDate: String,
+    isEnabled: Boolean = true
 ) {
-    // Código existente sin cambios
     val context = LocalContext.current
     val datePickerDialog = remember { mutableStateOf<DatePickerDialog?>(null) }
     val selectedDate = remember { mutableStateOf(currentDate) }
@@ -69,7 +69,6 @@ fun DatePicker(
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
     val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-
 
     LaunchedEffect(Unit) {
         datePickerDialog.value = DatePickerDialog(
@@ -85,8 +84,25 @@ fun DatePicker(
         )
     }
 
-    Button(onClick = { datePickerDialog.value?.show() }) {
-        Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
+    Button(
+        onClick = { if (isEnabled) datePickerDialog.value?.show() },
+        enabled = isEnabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = if (isEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
+            if (!isEnabled) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = "Date locked",
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
     }
 }
 
@@ -206,12 +222,12 @@ fun ImagePlaceholder() {
     }
 }
 
-
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun ItineraryScreen(
     navController: NavController,
     tripId: String? = null,
+    reservationId: String? = null,  // Added parameter for direct reservation linking
     tripViewModel: TripViewModel = hiltViewModel(),
     itineraryViewModel: ItineraryViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel(),
@@ -238,8 +254,34 @@ fun ItineraryScreen(
     // Reserva seleccionada para vincular al viaje
     var selectedReservationId by remember { mutableStateOf<String?>(null) }
 
+    // Estado para controlar si las fechas están bloqueadas (cuando hay una reserva vinculada)
+    var areDatesLocked by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // Variables de fecha para el viaje - MOVED HERE, BEFORE THE LaunchedEffect
+    val trip = allTrips.find { it.id == tripId }
+    var itineraryDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var tripStartDate by remember { mutableStateOf(trip?.startDate ?: "") }
+    var tripEndDate by remember { mutableStateOf(trip?.endDate ?: "") }
+    var itineraryDatesValid by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+    var isTripStartDateValid by remember { mutableStateOf(true) }
+    var isTripEndDateValid by remember { mutableStateOf(true) }
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+    fun stringToDate(dateString: String?): Date? = try { dateFormat.parse(dateString ?: "") } catch (_: Exception) { null }
+    fun isDateInFuture(date: String): Boolean = stringToDate(date)?.after(Calendar.getInstance().time) == true
+    fun isDateInTripRange(date: String, startDate: String, endDate: String): Boolean {
+        val dateParsed = stringToDate(date)
+        val start = stringToDate(startDate)
+        val end = stringToDate(endDate)
+        return if (dateParsed != null && start != null && end != null) {
+            !dateParsed.before(start) && !dateParsed.after(end)
+        } else {
+            false
+        }
+    }
 
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
@@ -247,6 +289,22 @@ fun ItineraryScreen(
             // Cargar las reservaciones del usuario
             reservationsViewModel.updateCurrentUser(user)
             reservationsViewModel.loadReservations()
+        }
+    }
+
+    // Cargar la reserva si se proporciona un ID
+    LaunchedEffect(reservationId, reservationsState.reservations) {
+        if (reservationId != null) {
+            val reservation = reservationsState.reservations.find { it.id == reservationId }
+            reservation?.let {
+                // Preseleccionar la reserva
+                selectedReservationId = it.id
+                // Establecer las fechas del viaje según la reserva
+                tripStartDate = it.startDate
+                tripEndDate = it.endDate
+                // Bloquear la edición de fechas
+                areDatesLocked = true
+            }
         }
     }
 
@@ -285,7 +343,6 @@ fun ItineraryScreen(
         return
     }
 
-    val trip = allTrips.find { it.id == tripId }
     Log.d("User Detected","$currentUser")
     val itineraries: List<ItineraryItem> = when {
         tripId != null && trip != null -> {
@@ -333,26 +390,6 @@ fun ItineraryScreen(
         Log.d("ItineraryScreen", "ProcessedImagesMap inicializado con ${initialImagesMap.size} entradas")
     }
 
-    var itineraryDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
-    var tripStartDate by remember { mutableStateOf(trip?.startDate ?: "") }
-    var tripEndDate by remember { mutableStateOf(trip?.endDate ?: "") }
-    var itineraryDatesValid by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
-    var isTripStartDateValid by remember { mutableStateOf(true) }
-    var isTripEndDateValid by remember { mutableStateOf(true) }
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-    fun stringToDate(dateString: String?): Date? = try { dateFormat.parse(dateString ?: "") } catch (_: Exception) { null }
-    fun isDateInFuture(date: String): Boolean = stringToDate(date)?.after(Calendar.getInstance().time) == true
-    fun isDateInTripRange(date: String, startDate: String, endDate: String): Boolean {
-        val dateParsed = stringToDate(date)
-        val start = stringToDate(startDate)
-        val end = stringToDate(endDate)
-        return if (dateParsed != null && start != null && end != null) {
-            !dateParsed.before(start) && !dateParsed.after(end)
-        } else {
-            false
-        }
-    }
-
     // Inicializar fechas de itinerarios
     LaunchedEffect(itineraries) {
         val dates = mutableMapOf<String, String>()
@@ -373,6 +410,8 @@ fun ItineraryScreen(
                 // Actualizar fechas del viaje para que coincidan con la reserva
                 tripStartDate = reservation.startDate
                 tripEndDate = reservation.endDate
+                // Bloquear la edición de fechas
+                areDatesLocked = true
             },
             onDismissRequest = { showReservationDialog = false }
         )
@@ -713,11 +752,14 @@ fun ItineraryScreen(
                         DatePicker(
                             currentDate = tripStartDate,
                             onDateSelected = {
-                                tripStartDate = it
-                                isTripStartDateValid = isDateInFuture(it)
+                                if (!areDatesLocked) {
+                                    tripStartDate = it
+                                    isTripStartDateValid = isDateInFuture(it)
+                                }
                             },
                             tripStartDate = tripStartDate,
-                            tripEndDate = tripEndDate
+                            tripEndDate = tripEndDate,
+                            isEnabled = !areDatesLocked
                         )
                     }
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -726,11 +768,14 @@ fun ItineraryScreen(
                         DatePicker(
                             currentDate = tripEndDate,
                             onDateSelected = {
-                                tripEndDate = it
-                                isTripEndDateValid = isDateInFuture(it)
+                                if (!areDatesLocked) {
+                                    tripEndDate = it
+                                    isTripEndDateValid = isDateInFuture(it)
+                                }
                             },
                             tripStartDate = tripStartDate,
-                            tripEndDate = tripEndDate
+                            tripEndDate = tripEndDate,
+                            isEnabled = !areDatesLocked
                         )
                     }
                 }
@@ -794,7 +839,12 @@ fun ItineraryScreen(
                                                 style = MaterialTheme.typography.bodySmall
                                             )
                                         }
-                                        IconButton(onClick = { selectedReservationId = null }) {
+                                        // Botón para eliminar la selección de reserva
+                                        IconButton(onClick = {
+                                            selectedReservationId = null
+                                            // Desbloquear la edición de fechas
+                                            areDatesLocked = false
+                                        }) {
                                             Icon(Icons.Default.Clear, contentDescription = "Remove")
                                         }
                                     }
@@ -882,7 +932,17 @@ fun ItineraryScreen(
 
                             // Si hay una reserva vinculada, actualizar la asociación en la base de datos
                             selectedReservationId?.let { reservationId ->
-                                reservationsViewModel.assignReservationToTrip(reservationId, newTripId)
+                                scope.launch {
+                                    try {
+                                        // Actualizar la relación en ambas direcciones
+                                        reservationsViewModel.assignReservationToTrip(reservationId, newTripId)
+
+                                        // Log success
+                                        Log.d("ItineraryScreen", "Successfully linked reservation $reservationId to trip $newTripId")
+                                    } catch (e: Exception) {
+                                        Log.e("ItineraryScreen", "Error linking reservation to trip: ${e.message}")
+                                    }
+                                }
                             }
 
                             // Navegar a la pantalla de viajes
@@ -898,7 +958,4 @@ fun ItineraryScreen(
             }
         }
     }
-
-
-
 }
