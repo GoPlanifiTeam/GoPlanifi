@@ -10,6 +10,6 @@ data class Trip(
     val endDate: String,
     val images: List<Image>?,
     val aiRecommendations: List<AIRecommendations>?,
-    val imageURL: String = "https://example.com/default-trip-image.jpg"
+    val imageURL: String = "https://example.com/default-trip-image.jpg",
+    val linkedReservationId: String? = null
 )
-

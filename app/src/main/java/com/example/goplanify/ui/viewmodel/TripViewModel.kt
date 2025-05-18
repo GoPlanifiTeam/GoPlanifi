@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class TripViewModel @Inject constructor(
     private val tripRepository: TripRepository
@@ -22,12 +23,16 @@ class TripViewModel @Inject constructor(
     private val _userTrips = MutableStateFlow<List<Trip>>(emptyList())
     val userTrips: StateFlow<List<Trip>> = _userTrips
 
+    // New state for linked trips
+    private val _currentUser = MutableStateFlow<User?>(null)
+
     init {
         fetchTrips()
     }
 
     fun getObjectUserTrips(user: User) {
         viewModelScope.launch {
+            _currentUser.value = user
             val trips = tripRepository.getTripsByUser(user.userId)
             Log.d("TripViewModel", "Trips fetched  $trips")
             _userTrips.value = trips
@@ -58,6 +63,11 @@ class TripViewModel @Inject constructor(
         viewModelScope.launch {
             tripRepository.addTrip(trip)
             fetchTrips()
+
+            // If the user is set, refresh their trips
+            _currentUser.value?.let { user ->
+                getObjectUserTrips(user)
+            }
         }
     }
 
@@ -74,5 +84,29 @@ class TripViewModel @Inject constructor(
             fetchTrips()
         }
     }
-}
 
+    // New method to delete trip linked to a reservation
+    fun deleteTripByReservationId(reservationId: String) {
+        viewModelScope.launch {
+            val tripToDelete = _trips.value.find { it.linkedReservationId == reservationId }
+
+            if (tripToDelete != null) {
+                Log.d("TripViewModel", "Deleting trip ${tripToDelete.id} linked to reservation $reservationId")
+                tripRepository.deleteTrip(tripToDelete.id)
+
+                // Refresh the trips list
+                fetchTrips()
+                _currentUser.value?.let { user ->
+                    getObjectUserTrips(user)
+                }
+            } else {
+                Log.d("TripViewModel", "No trip found linked to reservation $reservationId")
+            }
+        }
+    }
+
+    // Find trip linked to a reservation
+    fun findTripByReservationId(reservationId: String): Trip? {
+        return _trips.value.find { it.linkedReservationId == reservationId }
+    }
+}

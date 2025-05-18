@@ -15,5 +15,6 @@ data class TripEntity(
     val itinerariesJson: String?, // ← text
     val imagesJson: String?,      // ← text
     val recommendationsJson: String?, // ← text
-    val imageURL: String // ← text
+    val imageURL: String, // ← text
+    val linkedReservationId: String? = null // Added field to link to a hotel reservation
 )

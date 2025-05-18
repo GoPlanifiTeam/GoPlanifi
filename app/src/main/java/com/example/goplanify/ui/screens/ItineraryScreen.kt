@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,11 +39,14 @@ import com.example.goplanify.R
 import com.example.goplanify.domain.model.Image
 import com.example.goplanify.domain.model.ItineraryImage
 import com.example.goplanify.domain.model.ItineraryItem
+import com.example.goplanify.domain.model.Reservation
 import com.example.goplanify.domain.model.Trip
+import com.example.goplanify.ui.screens.BottomBar
 import com.example.goplanify.ui.screens.CommonTopBar
 import com.example.goplanify.ui.utils.ImageUtils
 import com.example.goplanify.utils.*
 import com.example.goplanify.ui.viewmodel.AuthViewModel
+import com.example.goplanify.ui.viewmodel.ReservationsViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -54,9 +58,9 @@ fun DatePicker(
     onDateSelected: (String) -> Unit,
     currentDate: String,
     tripStartDate: String,
-    tripEndDate: String
+    tripEndDate: String,
+    isEnabled: Boolean = true
 ) {
-    // Código existente sin cambios
     val context = LocalContext.current
     val datePickerDialog = remember { mutableStateOf<DatePickerDialog?>(null) }
     val selectedDate = remember { mutableStateOf(currentDate) }
@@ -65,7 +69,6 @@ fun DatePicker(
     val year = calendar.get(Calendar.YEAR)
     val month = calendar.get(Calendar.MONTH)
     val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-
 
     LaunchedEffect(Unit) {
         datePickerDialog.value = DatePickerDialog(
@@ -81,9 +84,86 @@ fun DatePicker(
         )
     }
 
-    Button(onClick = { datePickerDialog.value?.show() }) {
-        Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
+    Button(
+        onClick = { if (isEnabled) datePickerDialog.value?.show() },
+        enabled = isEnabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = if (isEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = selectedDate.value.ifEmpty { stringResource(R.string.add) })
+            if (!isEnabled) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = "Date locked",
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
     }
+}
+
+@Composable
+fun ReservationSelectionDialog(
+    reservations: List<Reservation>,
+    onReservationSelected: (Reservation) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text("Select a Hotel Booking") },
+        text = {
+            Column {
+                Text("Link this trip to one of your hotel reservations:",
+                    style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (reservations.isEmpty()) {
+                    Text("No hotel bookings available",
+                        style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.heightIn(max = 300.dp)
+                    ) {
+                        items(reservations) { reservation ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                                    .clickable {
+                                        onReservationSelected(reservation)
+                                        onDismissRequest()
+                                    },
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                )
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text(
+                                        text = reservation.hotel.name,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "${reservation.startDate} to ${reservation.endDate}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismissRequest) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 // Componente para mostrar una miniatura de imagen
@@ -142,43 +222,22 @@ fun ImagePlaceholder() {
     }
 }
 
-@Composable
-fun BottomBar(navController: NavController) {
-    NavigationBar {
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.trip)) },
-            selected = false,
-            onClick = { navController.navigate("home") },
-            label = { Text(stringResource(R.string.menu)) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.FormatListNumbered, contentDescription = stringResource(R.string.itinerary)) },
-            selected = false,
-            onClick = { navController.navigate("ItineraryScreen") },
-            label = { Text(stringResource(R.string.list)) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.myTrips)) },
-            selected = false,
-            onClick = { navController.navigate("tripsScreen") },
-            label = { Text(stringResource(R.string.profileScreen)) }
-        )
-    }
-}
-
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun ItineraryScreen(
     navController: NavController,
     tripId: String? = null,
+    reservationId: String? = null,  // Added parameter for direct reservation linking
     tripViewModel: TripViewModel = hiltViewModel(),
     itineraryViewModel: ItineraryViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    reservationsViewModel: ReservationsViewModel = hiltViewModel()
 ) {
     val currentUser by authViewModel.currentUser.collectAsState()
     val trips by tripViewModel.userTrips.collectAsState()
     val allTrips by tripViewModel.trips.collectAsState()
     val selectedItineraries by itineraryViewModel.selectedItineraries.collectAsState()
+    val reservationsState by reservationsViewModel.uiState.collectAsState()
 
     // Mapa para almacenar las imágenes de cada itinerario
     var itineraryImagesMap by remember { mutableStateOf<Map<String, List<Uri>>>(emptyMap()) }
@@ -189,11 +248,63 @@ fun ItineraryScreen(
     // Estado para mostrar imagen a pantalla completa
     var selectedImage by remember { mutableStateOf<Pair<String, String>?>(null) }
 
+    // Estado para mostrar el diálogo de selección de reserva
+    var showReservationDialog by remember { mutableStateOf(false) }
+
+    // Reserva seleccionada para vincular al viaje
+    var selectedReservationId by remember { mutableStateOf<String?>(null) }
+
+    // Estado para controlar si las fechas están bloqueadas (cuando hay una reserva vinculada)
+    var areDatesLocked by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Variables de fecha para el viaje - MOVED HERE, BEFORE THE LaunchedEffect
+    val trip = allTrips.find { it.id == tripId }
+    var itineraryDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var tripStartDate by remember { mutableStateOf(trip?.startDate ?: "") }
+    var tripEndDate by remember { mutableStateOf(trip?.endDate ?: "") }
+    var itineraryDatesValid by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+    var isTripStartDateValid by remember { mutableStateOf(true) }
+    var isTripEndDateValid by remember { mutableStateOf(true) }
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+    fun stringToDate(dateString: String?): Date? = try { dateFormat.parse(dateString ?: "") } catch (_: Exception) { null }
+    fun isDateInFuture(date: String): Boolean = stringToDate(date)?.after(Calendar.getInstance().time) == true
+    fun isDateInTripRange(date: String, startDate: String, endDate: String): Boolean {
+        val dateParsed = stringToDate(date)
+        val start = stringToDate(startDate)
+        val end = stringToDate(endDate)
+        return if (dateParsed != null && start != null && end != null) {
+            !dateParsed.before(start) && !dateParsed.after(end)
+        } else {
+            false
+        }
+    }
 
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
             tripViewModel.getObjectUserTrips(user)
+            // Cargar las reservaciones del usuario
+            reservationsViewModel.updateCurrentUser(user)
+            reservationsViewModel.loadReservations()
+        }
+    }
+
+    // Cargar la reserva si se proporciona un ID
+    LaunchedEffect(reservationId, reservationsState.reservations) {
+        if (reservationId != null) {
+            val reservation = reservationsState.reservations.find { it.id == reservationId }
+            reservation?.let {
+                // Preseleccionar la reserva
+                selectedReservationId = it.id
+                // Establecer las fechas del viaje según la reserva
+                tripStartDate = it.startDate
+                tripEndDate = it.endDate
+                // Bloquear la edición de fechas
+                areDatesLocked = true
+            }
         }
     }
 
@@ -210,22 +321,28 @@ fun ItineraryScreen(
 
     // If no user is authenticated, show login prompt
     if (currentUser == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = stringResource(R.string.no_user_logged_in))
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { navController.navigate("loginScreen") }) {
-                    Text(text = "Login")
+        Scaffold(
+            topBar = { CommonTopBar(title = stringResource(R.string.itinerary), navController) },
+            bottomBar = { BottomBar(navController) }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = stringResource(R.string.no_user_logged_in))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { navController.navigate("loginScreen") }) {
+                        Text(text = "Login")
+                    }
                 }
             }
         }
         return
     }
 
-    val trip = allTrips.find { it.id == tripId }
     Log.d("User Detected","$currentUser")
     val itineraries: List<ItineraryItem> = when {
         tripId != null && trip != null -> {
@@ -273,26 +390,6 @@ fun ItineraryScreen(
         Log.d("ItineraryScreen", "ProcessedImagesMap inicializado con ${initialImagesMap.size} entradas")
     }
 
-    var itineraryDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
-    var tripStartDate by remember { mutableStateOf(trip?.startDate ?: "") }
-    var tripEndDate by remember { mutableStateOf(trip?.endDate ?: "") }
-    var itineraryDatesValid by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
-    var isTripStartDateValid by remember { mutableStateOf(true) }
-    var isTripEndDateValid by remember { mutableStateOf(true) }
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-    fun stringToDate(dateString: String?): Date? = try { dateFormat.parse(dateString ?: "") } catch (_: Exception) { null }
-    fun isDateInFuture(date: String): Boolean = stringToDate(date)?.after(Calendar.getInstance().time) == true
-    fun isDateInTripRange(date: String, startDate: String, endDate: String): Boolean {
-        val dateParsed = stringToDate(date)
-        val start = stringToDate(startDate)
-        val end = stringToDate(endDate)
-        return if (dateParsed != null && start != null && end != null) {
-            !dateParsed.before(start) && !dateParsed.after(end)
-        } else {
-            false
-        }
-    }
-
     // Inicializar fechas de itinerarios
     LaunchedEffect(itineraries) {
         val dates = mutableMapOf<String, String>()
@@ -302,6 +399,22 @@ fun ItineraryScreen(
             }
         }
         itineraryDates = dates
+    }
+
+    // Diálogo para seleccionar una reserva de hotel para vincular al viaje
+    if (showReservationDialog) {
+        ReservationSelectionDialog(
+            reservations = reservationsState.reservations,
+            onReservationSelected = { reservation ->
+                selectedReservationId = reservation.id
+                // Actualizar fechas del viaje para que coincidan con la reserva
+                tripStartDate = reservation.startDate
+                tripEndDate = reservation.endDate
+                // Bloquear la edición de fechas
+                areDatesLocked = true
+            },
+            onDismissRequest = { showReservationDialog = false }
+        )
     }
 
     // Dialog para mostrar imagen a pantalla completa
@@ -396,6 +509,7 @@ fun ItineraryScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Contenido de LazyColumn que ya existe - lo dejo igual
             item {
                 if (tripId != null) {
                     Card(
@@ -411,6 +525,29 @@ fun ItineraryScreen(
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(text = "🆔 Trip ID: $tripId", style = MaterialTheme.typography.bodySmall)
+
+                            // Mostrar información de la reserva vinculada si existe
+                            trip?.linkedReservationId?.let { reservationId ->
+                                val linkedReservation = reservationsState.reservations.find { it.id == reservationId }
+                                linkedReservation?.let { reservation ->
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Divider()
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "🏨 Linked Hotel: ${reservation.hotel.name}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "🛏️ Room: ${reservation.room.roomType}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                    Text(
+                                        text = "📅 Stay: ${reservation.startDate} to ${reservation.endDate}",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
                         }
                     }
                     Text(
@@ -603,6 +740,8 @@ fun ItineraryScreen(
 
             item {
                 Spacer(modifier = Modifier.height(24.dp))
+
+                // Sección para fechas de inicio y fin
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -613,11 +752,14 @@ fun ItineraryScreen(
                         DatePicker(
                             currentDate = tripStartDate,
                             onDateSelected = {
-                                tripStartDate = it
-                                isTripStartDateValid = isDateInFuture(it)
+                                if (!areDatesLocked) {
+                                    tripStartDate = it
+                                    isTripStartDateValid = isDateInFuture(it)
+                                }
                             },
                             tripStartDate = tripStartDate,
-                            tripEndDate = tripEndDate
+                            tripEndDate = tripEndDate,
+                            isEnabled = !areDatesLocked
                         )
                     }
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -626,14 +768,107 @@ fun ItineraryScreen(
                         DatePicker(
                             currentDate = tripEndDate,
                             onDateSelected = {
-                                tripEndDate = it
-                                isTripEndDateValid = isDateInFuture(it)
+                                if (!areDatesLocked) {
+                                    tripEndDate = it
+                                    isTripEndDateValid = isDateInFuture(it)
+                                }
                             },
                             tripStartDate = tripStartDate,
-                            tripEndDate = tripEndDate
+                            tripEndDate = tripEndDate,
+                            isEnabled = !areDatesLocked
                         )
                     }
                 }
+
+                // Nueva sección para vincular a una reserva de hotel
+                Spacer(modifier = Modifier.height(24.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "🏨 Link to Hotel Reservation",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Connect this trip to one of your hotel bookings to automatically sync dates and manage both together.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Mostrar la reserva seleccionada o botón para elegir una
+                        if (selectedReservationId != null) {
+                            val selectedReservation = reservationsState.reservations.find { it.id == selectedReservationId }
+                            selectedReservation?.let { reservation ->
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surface
+                                    )
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Hotel,
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .size(32.dp)
+                                                .padding(end = 8.dp)
+                                        )
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = reservation.hotel.name,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = "${reservation.startDate} to ${reservation.endDate}",
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
+                                        // Botón para eliminar la selección de reserva
+                                        IconButton(onClick = {
+                                            selectedReservationId = null
+                                            // Desbloquear la edición de fechas
+                                            areDatesLocked = false
+                                        }) {
+                                            Icon(Icons.Default.Clear, contentDescription = "Remove")
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            Button(
+                                onClick = { showReservationDialog = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Icon(
+                                    Icons.Default.Hotel,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Select a Hotel Booking")
+                            }
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
@@ -688,14 +923,35 @@ fun ItineraryScreen(
                                 itineraries = newItineraries,
                                 images = null, // Este campo lo dejamos como null porque ahora cada itinerario tiene sus propias imágenes
                                 aiRecommendations = null,
-                                imageURL = trip?.imageURL ?: "https://example.com/default-trip-image.jpg"
+                                imageURL = trip?.imageURL ?: "https://example.com/default-trip-image.jpg",
+                                linkedReservationId = selectedReservationId  // Vincular la reserva si se seleccionó una
                             )
 
+                            // Guardar el viaje
                             tripViewModel.addTrip(newTrip)
+
+                            // Si hay una reserva vinculada, actualizar la asociación en la base de datos
+                            selectedReservationId?.let { reservationId ->
+                                scope.launch {
+                                    try {
+                                        // Actualizar la relación en ambas direcciones
+                                        reservationsViewModel.assignReservationToTrip(reservationId, newTripId)
+
+                                        // Log success
+                                        Log.d("ItineraryScreen", "Successfully linked reservation $reservationId to trip $newTripId")
+                                    } catch (e: Exception) {
+                                        Log.e("ItineraryScreen", "Error linking reservation to trip: ${e.message}")
+                                    }
+                                }
+                            }
+
+                            // Navegar a la pantalla de viajes
                             navController.navigate("tripsScreen")
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
                 ) {
                     Text(text = stringResource(R.string.save))
                 }

@@ -386,27 +386,3 @@ fun DatePickerInline(
         }
     }
 }
-
-@Composable
-fun BottomBar(navController: NavController) {
-    NavigationBar {
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.trip)) },
-            selected = false,
-            onClick = { navController.navigate("home") },
-            label = { Text(stringResource(R.string.menu)) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.FormatListNumbered, contentDescription = stringResource(R.string.itinerary)) },
-            selected = false,
-            onClick = { navController.navigate("ItineraryScreen") },
-            label = { Text(stringResource(R.string.list)) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.myTrips)) },
-            selected = false,
-            onClick = { navController.navigate("tripsScreen") },
-            label = { Text(stringResource(R.string.profileScreen)) }
-        )
-    }
-}

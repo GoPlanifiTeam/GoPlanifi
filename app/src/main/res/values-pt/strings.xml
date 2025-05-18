@@ -134,4 +134,11 @@
     <string name="itinerary_images">Imagens do itinerário</string>
     <string name="delete_image">Excluir imagem</string>
 
+    <string name="book_hotels">Reservar Hotéis</string>
+    <string name="my_reservations">Minhas Reservas</string>
+    <string name="hotels_accommodations">Hotéis e Acomodações</string>
+    <string name="hotels_description">Encontre e reserve hotéis em Londres, Paris ou Barcelona para a sua próxima viagem.</string>
+    <string name="search_hotels">Pesquisar Hotéis</string>
+    <string name="hotels">Hotéis</string>
+
 </resources>

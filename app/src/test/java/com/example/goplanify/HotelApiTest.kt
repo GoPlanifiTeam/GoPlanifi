@@ -2,9 +2,9 @@ package com.example.goplanify
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.goplanify.data.remote.api.HotelApiService
-import com.example.goplanify.data.remote.model.Hotel as DataHotel
-import com.example.goplanify.data.remote.model.HotelAvailabilityResponse
-import com.example.goplanify.data.remote.model.Room
+import com.example.goplanify.data.remote.dto.AvailabilityResponseDto
+import com.example.goplanify.data.remote.dto.HotelDto
+import com.example.goplanify.data.remote.dto.RoomDto
 import com.example.goplanify.data.repository.TestHotelRepositoryImpl
 import com.example.goplanify.domain.model.Hotel as DomainHotel
 import com.example.goplanify.utils.Resource
@@ -42,30 +42,27 @@ class HotelApiTest {
     fun getHotelAvailabilityReturnsSuccess() {
         runBlocking {
             // Given
-            val mockResponse = HotelAvailabilityResponse(
-                status = "success",
-                hotels = listOf(
-                    DataHotel(
+            val mockResponse = AvailabilityResponseDto(
+                available_hotels = listOf(
+                    HotelDto(
                         id = "1",
                         name = "Test Hotel",
-                        location = "Test Location",
-                        stars = 4,
-                        price = 150.0,
-                        imageUrl = "http://example.com/image.jpg",
-                        availability = true,
-                        address = "",
+                        address = "Test Location",
+                        rating = 4,
+                        image_url = "http://example.com/image.jpg",
                         rooms = emptyList()
                     )
                 )
             )
 
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(mockResponse))
 
@@ -86,11 +83,11 @@ class HotelApiTest {
 
             // Verify the mock was called with the expected parameters
             Mockito.verify(hotelApiService).getHotelAvailability(
+                "G02",
                 "Barcelona",
                 "2025-06-01",
                 "2025-06-05",
-                2,
-                "G02"
+                2
             )
         }
     }
@@ -99,13 +96,14 @@ class HotelApiTest {
     fun getHotelAvailabilityReturnsErrorOnApiFailure() {
         runBlocking {
             // Given
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.error(404, "Not found".toResponseBody(null)))
 
@@ -125,11 +123,11 @@ class HotelApiTest {
 
             // Verify the mock was called with the expected parameters
             Mockito.verify(hotelApiService).getHotelAvailability(
+                "G02",
                 "Barcelona",
                 "2025-06-01",
                 "2025-06-05",
-                2,
-                "G02"
+                2
             )
         }
     }
@@ -138,29 +136,25 @@ class HotelApiTest {
     fun getHotelAvailabilityProperlyMapsRoomData() {
         runBlocking {
             // Given - Create a response with rooms to test room mapping
-            val mockResponse = HotelAvailabilityResponse(
-                status = "success",
-                hotels = listOf(
-                    DataHotel(
+            val mockResponse = AvailabilityResponseDto(
+                available_hotels = listOf(
+                    HotelDto(
                         id = "1",
                         name = "Test Hotel",
-                        location = "",
-                        stars = 4,
-                        price = 0.0, // Should be overridden by room price
-                        imageUrl = "http://example.com/image.jpg",
-                        availability = true,
                         address = "123 Test Street",
+                        rating = 4,
+                        image_url = "http://example.com/image.jpg",
                         rooms = listOf(
-                            Room(
+                            RoomDto(
                                 id = "room1",
-                                roomType = "Deluxe",
-                                price = 199.99,
+                                room_type = "Deluxe",
+                                price = 199.99f,
                                 images = listOf("http://example.com/room1.jpg")
                             ),
-                            Room(
+                            RoomDto(
                                 id = "room2",
-                                roomType = "Suite",
-                                price = 299.99,
+                                room_type = "Suite",
+                                price = 299.99f,
                                 images = listOf("http://example.com/room2.jpg")
                             )
                         )
@@ -168,13 +162,14 @@ class HotelApiTest {
                 )
             )
 
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(mockResponse))
 
@@ -193,14 +188,29 @@ class HotelApiTest {
             val hotel = successResult.data?.firstOrNull()
             assertNotNull("Hotel should not be null", hotel)
 
-            // Check if room data was mapped correctly
-            assertEquals("123 Test Street", hotel?.location) // Address mapped to location
-            assertEquals(199.99, hotel?.price ?: 0.0, 0.01) // Price taken from first room
-            assertEquals(2, hotel?.rooms?.size) // Both rooms mapped
-            assertEquals("Deluxe", hotel?.rooms?.get(0)?.type)
-            assertEquals(199.99, hotel?.rooms?.get(0)?.price ?: 0.0, 0.01)
-            assertEquals("Suite", hotel?.rooms?.get(1)?.type)
-            assertEquals(299.99, hotel?.rooms?.get(1)?.price ?: 0.0, 0.01)
+            // Check if hotel data was mapped correctly
+            assertEquals("1", hotel?.id)
+            assertEquals("Test Hotel", hotel?.name)
+            assertEquals("123 Test Street", hotel?.address)
+            assertEquals(4, hotel?.rating)
+            assertEquals("http://example.com/image.jpg", hotel?.imageUrl)
+
+            // Check if rooms data was mapped correctly
+            assertEquals(2, hotel?.rooms?.size)
+
+            val room1 = hotel?.rooms?.get(0)
+            assertEquals("room1", room1?.id)
+            assertEquals("Deluxe", room1?.roomType)
+            assertEquals(199.99f, room1?.price ?: 0.0f, 0.01f)
+            assertEquals(1, room1?.images?.size)
+            assertEquals("http://example.com/room1.jpg", room1?.images?.get(0))
+
+            val room2 = hotel?.rooms?.get(1)
+            assertEquals("room2", room2?.id)
+            assertEquals("Suite", room2?.roomType)
+            assertEquals(299.99f, room2?.price ?: 0.0f, 0.01f)
+            assertEquals(1, room2?.images?.size)
+            assertEquals("http://example.com/room2.jpg", room2?.images?.get(0))
         }
     }
 
@@ -208,13 +218,14 @@ class HotelApiTest {
     fun getHotelAvailabilityWithNullResponseBodyReturnsError() {
         runBlocking {
             // Given - Create a successful response but with null body
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(null))
 
@@ -238,18 +249,18 @@ class HotelApiTest {
     fun getHotelAvailabilityWithEmptyHotelListReturnsEmptyList() {
         runBlocking {
             // Given - Create a response with empty hotels list
-            val mockResponse = HotelAvailabilityResponse(
-                status = "success",
-                hotels = emptyList()
+            val mockResponse = AvailabilityResponseDto(
+                available_hotels = emptyList()
             )
 
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(mockResponse))
 
@@ -273,13 +284,14 @@ class HotelApiTest {
     fun getHotelAvailabilityWithNetworkExceptionReturnsError() {
         runBlocking {
             // Given - Simulate a network error
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenAnswer { throw IOException("Network unavailable") }
 

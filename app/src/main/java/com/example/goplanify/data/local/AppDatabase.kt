@@ -12,6 +12,7 @@ import com.example.goplanify.data.local.dao.AuthenticationDao
 import com.example.goplanify.data.local.dao.ItineraryDao
 import com.example.goplanify.data.local.dao.ItineraryImageDao
 import com.example.goplanify.data.local.dao.PreferencesDao
+import com.example.goplanify.data.local.dao.ReservationDao
 import com.example.goplanify.data.local.dao.TripDao
 import com.example.goplanify.data.local.dao.UserDao
 import com.example.goplanify.data.local.entity.ItineraryItemEntity
@@ -20,6 +21,7 @@ import com.example.goplanify.data.local.entity.TripEntity
 import com.example.goplanify.data.local.entity.UserEntity
 import com.example.goplanify.data.local.entity.AuthenticationEntity
 import com.example.goplanify.data.local.entity.PreferencesEntity
+import com.example.goplanify.data.local.entity.ReservationEntity
 
 @Database(
     entities = [
@@ -28,7 +30,8 @@ import com.example.goplanify.data.local.entity.PreferencesEntity
         UserEntity::class,
         AuthenticationEntity::class,
         PreferencesEntity::class,
-        ItineraryImageEntity::class  // Nueva entidad añadida
+        ItineraryImageEntity::class,
+        ReservationEntity::class
     ],
     version = 3, // Incrementado a versión 3 para la nueva migración
     exportSchema = false
@@ -40,7 +43,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun authenticationDao(): AuthenticationDao
     abstract fun preferencesDao(): PreferencesDao
-    abstract fun itineraryImageDao(): ItineraryImageDao // Nuevo DAO añadido
+    abstract fun itineraryImageDao(): ItineraryImageDao
+    abstract fun reservationDao(): ReservationDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the same time
@@ -69,6 +73,35 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     """
                 )
+
+                database.execSQL(
+                    """
+                    CREATE TABLE reservations (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        hotelId TEXT NOT NULL,
+                        roomId TEXT NOT NULL,
+                        startDate TEXT NOT NULL,
+                        endDate TEXT NOT NULL,
+                        guestName TEXT NOT NULL,
+                        guestEmail TEXT NOT NULL,
+                        hotelName TEXT NOT NULL,
+                        hotelAddress TEXT NOT NULL,
+                        hotelImageUrl TEXT NOT NULL,
+                        roomType TEXT NOT NULL,
+                        roomPrice REAL NOT NULL,
+                        totalPrice REAL NOT NULL,
+                        nights INTEGER NOT NULL,
+                        tripId TEXT,
+                        FOREIGN KEY (tripId) REFERENCES trips(id) ON DELETE SET NULL
+                    )
+                    """
+                )
+
+                // Create an index for tripId for faster queries
+                database.execSQL(
+                    "CREATE INDEX index_reservations_tripId ON reservations(tripId)"
+                )
+
 
                 // Copy the data from the old table to the new table
                 database.execSQL(
