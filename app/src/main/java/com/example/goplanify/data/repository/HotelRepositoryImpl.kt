@@ -1,7 +1,10 @@
 package com.example.goplanify.data.repository
 
 import android.util.Log
+import com.example.goplanify.data.local.dao.ReservationDao
+import com.example.goplanify.data.local.entity.ReservationEntity
 import com.example.goplanify.data.remote.api.HotelApiService
+import com.example.goplanify.data.remote.dto.ReservationResponseDto
 import com.example.goplanify.data.remote.dto.ReserveRequestDto
 import com.example.goplanify.data.remote.mapper.toDomain
 import com.example.goplanify.domain.model.Hotel
@@ -15,7 +18,8 @@ import javax.inject.Singleton
 
 @Singleton
 class HotelRepositoryImpl @Inject constructor(
-    private val apiService: HotelApiService
+    private val apiService: HotelApiService,
+    private val reservationDao: ReservationDao
 ) : HotelRepository {
 
     private val TAG = "HotelRepository"
@@ -90,7 +94,7 @@ class HotelRepositoryImpl @Inject constructor(
         endDate: String,
         guestName: String,
         guestEmail: String
-    ): Resource<String> {
+    ): Resource<ReservationResponseDto> {
         return try {
             val request = ReserveRequestDto(
                 hotel_id = hotelId,
@@ -101,53 +105,40 @@ class HotelRepositoryImpl @Inject constructor(
                 guest_email = guestEmail
             )
 
-            val response = apiService.reserveRoom(groupId, request)
+            val response = apiService.reserveRoom(groupId, request) // Use apiService instead of api
+
             if (response.isSuccessful) {
                 val reservationResponse = response.body()
                 if (reservationResponse != null) {
-                    Log.d(TAG, "Successfully created reservation")
-                    Resource.Success(reservationResponse.reservation.id)
+                    Resource.Success(reservationResponse)
                 } else {
-                    Log.e(TAG, "Response body is null for reservation")
                     Resource.Error("Response body is null")
                 }
             } else {
-                Log.e(TAG, "Error creating reservation: ${response.code()}: ${response.message()}")
                 Resource.Error("Error: ${response.code()}: ${response.message()}")
             }
         } catch (e: HttpException) {
-            Log.e(TAG, "HTTP error while creating reservation", e)
-            Resource.Error("HTTP error: ${e.message}")
+            Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
         } catch (e: IOException) {
-            Log.e(TAG, "Network error while creating reservation", e)
-            Resource.Error("Network error: ${e.message}")
+            Resource.Error("Couldn't reach server. Check your internet connection.")
         } catch (e: Exception) {
-            Log.e(TAG, "Unknown error while creating reservation", e)
-            Resource.Error("Unknown error: ${e.message}")
+            Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
         }
     }
 
-    override suspend fun cancelReservation(
-        groupId: String,
-        hotelId: String,
-        roomId: String,
-        reservationId: String
-    ): Resource<Boolean> {
+    override suspend fun cancelReservation(reservationId: String): Resource<Reservation> {
         return try {
-            // Since we need reservation details for cancellation according to the API
-            val request = ReserveRequestDto(
-                hotel_id = hotelId,
-                room_id = roomId,
-                start_date = "", // Not used for cancellation
-                end_date = "",   // Not used for cancellation
-                guest_name = "", // Not used for cancellation
-                guest_email = ""  // Not used for cancellation
-            )
+            val response = apiService.cancelReservation(reservationId)
 
-            val response = apiService.cancelReservation(groupId, request)
             if (response.isSuccessful) {
-                Log.d(TAG, "Successfully cancelled reservation $reservationId")
-                Resource.Success(true)
+                val cancelledReservation = response.body()
+                if (cancelledReservation != null) {
+                    Log.d(TAG, "Successfully cancelled reservation $reservationId")
+                    Resource.Success(cancelledReservation.toDomain())
+                } else {
+                    Log.e(TAG, "Response body is null for cancellation")
+                    Resource.Error("Response body is null")
+                }
             } else {
                 Log.e(TAG, "Error cancelling reservation: ${response.code()}: ${response.message()}")
                 Resource.Error("Error: ${response.code()}: ${response.message()}")
@@ -202,4 +193,28 @@ class HotelRepositoryImpl @Inject constructor(
             }
         }
     }
+    override suspend fun saveReservationLocally(reservation: ReservationEntity) {
+        reservationDao.insertReservation(reservation)
+    }
+
+    override suspend fun getLocalReservations(email: String): List<ReservationEntity> {
+        return reservationDao.getReservationsForUser(email)
+    }
+
+    override suspend fun deleteLocalReservation(reservationId: String) {
+        reservationDao.deleteReservation(reservationId)
+    }
+
+    override suspend fun assignReservationToTrip(reservationId: String, tripId: String) {
+        reservationDao.assignReservationToTrip(reservationId, tripId)
+    }
+
+    override suspend fun removeReservationFromTrip(reservationId: String) {
+        reservationDao.removeReservationFromTrip(reservationId)
+    }
+
+    override suspend fun getReservationsForTrip(tripId: String): List<ReservationEntity> {
+        return reservationDao.getReservationsForTrip(tripId)
+    }
+
 }

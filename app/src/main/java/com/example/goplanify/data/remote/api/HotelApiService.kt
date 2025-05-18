@@ -29,13 +29,12 @@ interface HotelApiService {
         @Body request: ReserveRequestDto
     ): Response<ReservationResponseDto>
 
-    @POST("hotels/{group_id}/cancel")
+    @DELETE("reservations/{reservation_id}")
     suspend fun cancelReservation(
-        @Path("group_id") groupId: String = "G02",
-        @Body request: ReserveRequestDto
-    ): Response<Any>
+        @Path("reservation_id") reservationId: String
+    ): Response<ReservationDto>
 
-    @GET("hotels/{group_id}/list_reservations")
+    @GET("hotels/{group_id}/reservations")
     suspend fun getReservations(
         @Path("group_id") groupId: String = "G02",
         @Query("guest_email") guestEmail: String? = null

@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.goplanify.BuildConfig
+import com.example.goplanify.ui.viewmodel.AuthViewModel
 import com.example.goplanify.ui.viewmodel.HotelDetailViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -37,13 +38,21 @@ fun HotelDetailScreen(
     startDateStr: String,
     endDateStr: String,
     navController: NavController,
-    viewModel: HotelDetailViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    hotelDetailViewModel: HotelDetailViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by hotelDetailViewModel.uiState.collectAsState()
+    val currentUser by authViewModel.currentUser.collectAsState()
     val base = BuildConfig.HOTELS_API_URL.trimEnd('/')
     var showConfirmation by remember { mutableStateOf(false) }
     var showRoomImages by remember { mutableStateOf(false) }
     var selectedImages by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    // Pass the current user to HotelDetailViewModel when it changes
+    LaunchedEffect(currentUser) {
+        hotelDetailViewModel.updateCurrentUser(currentUser)
+    }
+
 
     // Calcular noches de estancia
     val dateFormat = DateTimeFormatter.ISO_DATE
@@ -53,7 +62,7 @@ fun HotelDetailScreen(
 
     // Cargar datos del hotel al entrar
     LaunchedEffect(hotelId) {
-        viewModel.loadHotelDetails(hotelId, groupId, startDateStr, endDateStr)
+        hotelDetailViewModel.loadHotelDetails(hotelId, groupId, startDateStr, endDateStr)
     }
 
     Scaffold(
@@ -148,7 +157,7 @@ fun HotelDetailScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Button(onClick = {
-                                viewModel.selectRoom(room)
+                                hotelDetailViewModel.selectRoom(room)
                                 showConfirmation = true
                             }) {
                                 Text("Reserve")
@@ -257,11 +266,12 @@ fun HotelDetailScreen(
                     Text("Dates: $startDateStr to $endDateStr")
                     Text("Nights: $nights")
                     Text("Total: ${totalPrice}€")
+                    Text("User: ${currentUser?.email ?: "Guest"}")
                 }
             },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.reserveRoom()
+                    hotelDetailViewModel.reserveRoom()
                     showConfirmation = false
                     navController.navigate("reservations") {
                         popUpTo("book") { inclusive = false }

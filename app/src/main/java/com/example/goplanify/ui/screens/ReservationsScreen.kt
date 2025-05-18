@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.goplanify.BuildConfig
 import com.example.goplanify.domain.model.Reservation
+import com.example.goplanify.ui.viewmodel.AuthViewModel
 import com.example.goplanify.ui.viewmodel.ReservationsViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -30,14 +31,16 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun ReservationsScreen(
     navController: NavController,
-    viewModel: ReservationsViewModel = hiltViewModel()
+    viewModel: ReservationsViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val currentUser by authViewModel.currentUser.collectAsState()
     val base = BuildConfig.HOTELS_API_URL.trimEnd('/')
 
-    // Cargar reservas al entrar
-    LaunchedEffect(Unit) {
-        viewModel.loadReservations()
+    // Pass the current user to the ViewModel
+    LaunchedEffect(currentUser) {
+        viewModel.updateCurrentUser(currentUser)
     }
 
     Column(
@@ -66,6 +69,15 @@ fun ReservationsScreen(
                     contentDescription = "Reload"
                 )
             }
+        }
+
+        // User info
+        currentUser?.let {
+            Text(
+                text = "Reservations for: ${it.email}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
         }
 
         // Lista de reservas

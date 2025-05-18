@@ -51,7 +51,7 @@ object AppModule {
     @Provides fun provideAuthenticationDao(db: AppDatabase): AuthenticationDao = db.authenticationDao()
     @Provides fun providePreferencesDao(db: AppDatabase): PreferencesDao = db.preferencesDao()
     @Provides fun provideItineraryImageDao(db: AppDatabase): ItineraryImageDao = db.itineraryImageDao() // Nuevo DAO
-
+    @Provides fun provideReservationDao(database: AppDatabase): ReservationDao { return database.reservationDao() }
     // Repositories (con interfaz)
     @Provides
     @Singleton
@@ -106,6 +106,16 @@ object AppModule {
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
+    }
+
+    // Hotel Repository
+    @Provides
+    @Singleton
+    fun provideHotelRepository(
+        apiService: HotelApiService,
+        reservationDao: ReservationDao
+    ): HotelRepository {
+        return HotelRepositoryImpl(apiService, reservationDao)
     }
 
 }

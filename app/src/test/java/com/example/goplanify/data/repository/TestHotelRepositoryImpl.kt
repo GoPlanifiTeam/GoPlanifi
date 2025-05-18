@@ -5,6 +5,7 @@ import com.example.goplanify.data.remote.dto.AvailabilityResponseDto
 import com.example.goplanify.data.remote.dto.ReserveRequestDto
 import com.example.goplanify.data.remote.mapper.toDomain
 import com.example.goplanify.domain.model.Hotel
+import com.example.goplanify.domain.model.Reservation
 import com.example.goplanify.domain.repository.HotelRepository
 import com.example.goplanify.utils.Resource
 import retrofit2.HttpException
@@ -31,7 +32,13 @@ class TestHotelRepositoryImpl @Inject constructor(
         groupId: String
     ): Resource<List<Hotel>> {
         return try {
-            val response = apiService.getHotelAvailability(destination, checkIn, checkOut, guests, groupId)
+            val response = apiService.getHotelAvailability(
+                groupId = groupId,
+                city = destination,
+                startDate = checkIn,
+                endDate = checkOut,
+                guests = guests
+            )
             if (response.isSuccessful) {
                 val availabilityResponse = response.body()
                 if (availabilityResponse != null) {
@@ -73,6 +80,13 @@ class TestHotelRepositoryImpl @Inject constructor(
         roomId: String,
         reservationId: String
     ): Resource<Boolean> {
+        TODO("Not implemented for test")
+    }
+
+    override suspend fun getReservations(
+        groupId: String,
+        guestEmail: String?
+    ): Resource<List<Reservation>> {
         TODO("Not implemented for test")
     }
 }

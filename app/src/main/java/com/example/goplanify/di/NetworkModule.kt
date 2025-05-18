@@ -20,9 +20,4 @@ object NetworkModule {
         return RetrofitClient.hotelApiService
     }
 
-    @Provides
-    @Singleton
-    fun provideHotelRepository(apiService: HotelApiService): HotelRepository {
-        return HotelRepositoryImpl(apiService)
-    }
 }

@@ -55,13 +55,14 @@ class HotelApiTest {
                 )
             )
 
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(mockResponse))
 
@@ -82,11 +83,11 @@ class HotelApiTest {
 
             // Verify the mock was called with the expected parameters
             Mockito.verify(hotelApiService).getHotelAvailability(
+                "G02",
                 "Barcelona",
                 "2025-06-01",
                 "2025-06-05",
-                2,
-                "G02"
+                2
             )
         }
     }
@@ -95,13 +96,14 @@ class HotelApiTest {
     fun getHotelAvailabilityReturnsErrorOnApiFailure() {
         runBlocking {
             // Given
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.error(404, "Not found".toResponseBody(null)))
 
@@ -121,11 +123,11 @@ class HotelApiTest {
 
             // Verify the mock was called with the expected parameters
             Mockito.verify(hotelApiService).getHotelAvailability(
+                "G02",
                 "Barcelona",
                 "2025-06-01",
                 "2025-06-05",
-                2,
-                "G02"
+                2
             )
         }
     }
@@ -160,13 +162,14 @@ class HotelApiTest {
                 )
             )
 
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(mockResponse))
 
@@ -215,13 +218,14 @@ class HotelApiTest {
     fun getHotelAvailabilityWithNullResponseBodyReturnsError() {
         runBlocking {
             // Given - Create a successful response but with null body
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(null))
 
@@ -249,13 +253,14 @@ class HotelApiTest {
                 available_hotels = emptyList()
             )
 
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenReturn(Response.success(mockResponse))
 
@@ -279,13 +284,14 @@ class HotelApiTest {
     fun getHotelAvailabilityWithNetworkExceptionReturnsError() {
         runBlocking {
             // Given - Simulate a network error
+            // Fix: Updated parameter order to match HotelApiService
             Mockito.`when`(
                 hotelApiService.getHotelAvailability(
-                    "Barcelona",
-                    "2025-06-01",
-                    "2025-06-05",
-                    2,
-                    "G02"
+                    groupId = "G02",
+                    city = "Barcelona",
+                    startDate = "2025-06-01",
+                    endDate = "2025-06-05",
+                    guests = 2
                 )
             ).thenAnswer { throw IOException("Network unavailable") }
 

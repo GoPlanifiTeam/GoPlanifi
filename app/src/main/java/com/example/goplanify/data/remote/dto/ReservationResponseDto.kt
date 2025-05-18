@@ -6,4 +6,3 @@ data class ReservationResponseDto(
     val nights: Int,
     val reservation: ReservationDto        // ya trae hotel + room
 )
-
